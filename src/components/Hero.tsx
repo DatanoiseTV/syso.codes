@@ -21,8 +21,8 @@ export function Hero({ publicRepos, totalStars, followers }: Props) {
             DatanoiseTV
           </a>
           . I write embedded firmware, FPGA gateware, DSP languages,
-          low-latency network audio and native macOS apps. Most of it lives on
-          GitHub, all of it is open source.
+          low-latency network audio and native macOS apps. Most of it lives
+          on GitHub, and most of it is open source.
         </p>
         <div className="hero__stats">
           <Stat label="Public repos on GitHub" value={publicRepos.toLocaleString()} />
