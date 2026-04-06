@@ -5,6 +5,8 @@ interface Props {
   type: ArtType;
   slug?: string;
   category?: Category;
+  language?: string;
+  topics?: string[];
   className?: string;
 }
 
@@ -13,9 +15,17 @@ interface Props {
  * Each one tries to evoke the project domain (chip, optical, FPGA, etc.)
  * while staying coherent with the site's cyan/amber palette.
  */
-export function ProjectArt({ type, slug, category, className }: Props) {
+export function ProjectArt({ type, slug, category, language, topics, className }: Props) {
   if (type === "auto") {
-    return <ProceduralArt slug={slug ?? "default"} category={category} className={className} />;
+    return (
+      <ProceduralArt
+        slug={slug ?? "default"}
+        category={category}
+        language={language}
+        topics={topics}
+        className={className}
+      />
+    );
   }
   switch (type) {
     case "chip":

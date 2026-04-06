@@ -117,6 +117,8 @@ function ProjectCard({ project }: { project: Project }) {
             type={project.art ?? "auto"}
             slug={project.slug}
             category={project.category}
+            language={project.language}
+            topics={project.topics}
             className="card__svg"
           />
         )}

@@ -23,6 +23,8 @@ export function FeaturedProject({ project, hero }: Props) {
             type={project.art ?? "auto"}
             slug={project.slug}
             category={project.category}
+            language={project.language}
+            topics={project.topics}
             className="featured-card__svg"
           />
         )}

@@ -3,23 +3,26 @@ import type { Category } from "../types";
 interface Props {
   slug: string;
   category?: Category;
+  language?: string;
+  topics?: string[];
   className?: string;
 }
 
 /**
  * Deterministic procedural SVG art for projects without screenshots.
- * Same slug always renders the same composition — pick is hash-based.
  *
- * Each composition draws from a small vocabulary of audio/electronics
- * primitives (sine, square, FPGA cells, chip outlines, level meters,
- * concentric pings, node graphs, spiral traces, wave stacks). Colour
- * palette and minor parameters vary per slug to make each tile unique.
+ * The composition is picked based on the project's category, language and
+ * topics — so an FPGA project always gets the FPGA grid, an MCU project the
+ * chip outline, a network audio project the packet constellation, etc.
+ * Only the colour palette and minor sizing parameters are hash-randomised
+ * per slug, so the same project always renders the same image but each one
+ * still feels visually distinct.
  */
-export function ProceduralArt({ slug, category, className }: Props) {
+export function ProceduralArt({ slug, category, language, topics = [], className }: Props) {
   const seed = hash(slug);
   const palette = PALETTES[seed % PALETTES.length];
-  const compIndex = (Math.floor(seed / 7) % COMPOSITIONS.length + COMPOSITIONS.length) % COMPOSITIONS.length;
-  const Composition = COMPOSITIONS[compIndex];
+  const composition = pickComposition({ slug, category, language, topics });
+  const Composition = COMPOSITIONS[composition];
   const r = rng(seed);
   const tag = categoryTag(category);
   return (
@@ -68,6 +71,113 @@ export function ProceduralArt({ slug, category, className }: Props) {
       </text>
     </svg>
   );
+}
+
+// ─── Composition picker ────────────────────────────────────────────────────
+type CompName =
+  | "sine"
+  | "bars"
+  | "concentric"
+  | "fpga"
+  | "chip"
+  | "scope"
+  | "constellation"
+  | "spiral"
+  | "waveStack"
+  | "diagonalFlow"
+  | "pulse"
+  | "matrix";
+
+function pickComposition({
+  slug,
+  category,
+  language,
+  topics,
+}: {
+  slug: string;
+  category?: Category;
+  language?: string;
+  topics: string[];
+}): CompName {
+  const all = [slug, language ?? "", category ?? "", ...topics, slug.replace(/-/g, " ")]
+    .join(" ")
+    .toLowerCase();
+
+  // Order matters — most specific keywords first.
+
+  // FPGA / gateware → fabric grid
+  if (/(fpga|ecp5|lattice|verilog|vhdl|gateware|litex|migen|colorlight|hdl)/.test(all))
+    return "fpga";
+
+  // Patchbay / matrix mixer / crosspoint → matrix grid with connections
+  if (/(patchbay|matrix|crosspoint|mt8816|mixer|routing)/.test(all)) return "matrix";
+
+  // Logic analyzer / debug probe → multi-trace scope
+  if (/(logic-analyzer|sigrok|dslogic|debug|probe|debugomatic|sniff)/.test(all))
+    return "scope";
+
+  // RF / wireless / find3 / PTP / nRF24 → concentric pings
+  if (/(find3|location|indoor|positioning|nrf24|rf|wireless|mesh|airplay)/.test(all))
+    return "concentric";
+
+  // MIDI / SysEx / clock pulses → pulse train
+  if (/(midi|sysex|turbomidi|metronome|clock-out|gate|arpeggi)/.test(all)) return "pulse";
+
+  // Network audio / IP audio / streaming → node constellation
+  if (/(aes67|ravenna|usbip|usb-ip|rtp|ptp|ieee.1588|jack-link|streaming|icecast|webrtc|tinyice|airplay|network-audio)/.test(all))
+    return "constellation";
+
+  // Wavetable / oscillator / synthesizer / saturation → stacked waveforms
+  if (/(wavetable|akwf|oscillator|wavefolder|synthesizer|synth|spice|saturation|distort|filter|biquad|eq|effect)/.test(all))
+    return "waveStack";
+
+  // Level meter / VU / spectrum → vertical bars
+  if (/(meter|level|spectrum|vu|fft|analy[sz]er|monitor)/.test(all)) return "bars";
+
+  // Generic audio / DSP / clock / ADAT / I2S / SPDIF / TDM → big sine wave
+  if (/(audio|dsp|signal|sample-rate|adat|i2s|spdif|tdm|toslink|optical|alsa|jack|pcm|codec|dac|adc|si5351|pll|clock|crystal)/.test(all))
+    return "sine";
+
+  // Eurorack / CV / modular → chip (closest visual)
+  if (/(eurorack|modular|cv|gate|sequencer|trigger)/.test(all)) return "chip";
+
+  // ESP32 / RP2040 / MCU / firmware / hardware → chip
+  if (/(esp32|esp8266|stm32|rp2040|rp2350|pico|teensy|microcontroller|firmware|mcu|romemu|tinyusb|hardware|board|sdk)/.test(all))
+    return "chip";
+
+  // AI / LLM / MCP / whisper → scope (terminal-like read-out)
+  if (/(ai|llm|gpt|gemini|claude|whisper|mcp|brainmcp|translator|agent|assistant)/.test(all))
+    return "scope";
+
+  // Linux kernel / driver / OS / build → pulse (heartbeat)
+  if (/(linux|kernel|driver|alsa-lkm|buildroot|systemd|swupdate|splash|ssdsplash|os)/.test(all))
+    return "pulse";
+
+  // CLI / library / template / sdk / header-only → diagonal flow
+  if (/(cli|library|template|sdk|header-only|headeronly|tool|webcomponent)/.test(all))
+    return "diagonalFlow";
+
+  // Tier 2 — fall back by category
+  switch (category) {
+    case "fpga":
+      return "fpga";
+    case "embedded":
+      return "chip";
+    case "audio-app":
+    case "audio-server":
+      return "sine";
+    case "linux-audio":
+      return "pulse";
+    case "ai-tools":
+      return "scope";
+    case "dev-tools":
+      return "diagonalFlow";
+  }
+
+  // Tier 3 — last resort, hash-derived
+  const seed = hash(slug);
+  const order: CompName[] = ["sine", "chip", "fpga", "constellation", "matrix", "scope"];
+  return order[seed % order.length]!;
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -513,17 +623,17 @@ function CompMatrix({ palette, r }: CompProps) {
   );
 }
 
-const COMPOSITIONS: Array<(p: CompProps) => JSX.Element> = [
-  CompSine,
-  CompBars,
-  CompConcentric,
-  CompFpgaGrid,
-  CompChip,
-  CompScope,
-  CompConstellation,
-  CompSpiral,
-  CompWaveStack,
-  CompDiagonalFlow,
-  CompPulse,
-  CompMatrix,
-];
+const COMPOSITIONS: Record<CompName, (p: CompProps) => JSX.Element> = {
+  sine: CompSine,
+  bars: CompBars,
+  concentric: CompConcentric,
+  fpga: CompFpgaGrid,
+  chip: CompChip,
+  scope: CompScope,
+  constellation: CompConstellation,
+  spiral: CompSpiral,
+  waveStack: CompWaveStack,
+  diagonalFlow: CompDiagonalFlow,
+  pulse: CompPulse,
+  matrix: CompMatrix,
+};
