@@ -87,7 +87,10 @@ type CompName =
   | "diagonalFlow"
   | "pulse"
   | "matrix"
-  | "phone";
+  | "phone"
+  | "code"
+  | "chart"
+  | "log";
 
 function pickComposition({
   slug,
@@ -161,9 +164,20 @@ function pickComposition({
   if (/(linux|kernel|driver|alsa-lkm|buildroot|systemd|swupdate|splash|ssdsplash|os)/.test(all))
     return "pulse";
 
-  // CLI / library / template / sdk / header-only → diagonal flow
-  if (/(cli|library|template|sdk|header-only|headeronly|tool|webcomponent)/.test(all))
-    return "diagonalFlow";
+  // Metrics / Grafana / time-series / monitoring → line chart
+  if (/(metric|grafana|prometheus|influx|time-series|monitoring|telemetry|stats)/.test(all))
+    return "chart";
+
+  // Logging / log libs → log lines
+  if (/(log|logger|logging|xlog|tracing|journal)/.test(all)) return "log";
+
+  // Config / settings / serializer / parser / xconfig → code snippet
+  if (/(config|settings|serializ|parser|schema|yaml|toml|json|ini|kv|key-value|xconfig)/.test(all))
+    return "code";
+
+  // CLI / library / template / sdk / header-only / VS Code extension → code
+  if (/(cli|library|template|sdk|header-only|headeronly|tool|webcomponent|vscode|extension)/.test(all))
+    return "code";
 
   // Tier 2 — fall back by category
   switch (category) {
@@ -179,7 +193,7 @@ function pickComposition({
     case "ai-tools":
       return "scope";
     case "dev-tools":
-      return "diagonalFlow";
+      return "code";
   }
 
   // Tier 3 — last resort, hash-derived
@@ -645,7 +659,305 @@ const COMPOSITIONS: Record<CompName, (p: CompProps) => JSX.Element> = {
   pulse: CompPulse,
   matrix: CompMatrix,
   phone: CompPhone,
+  code: CompCode,
+  chart: CompChart,
+  log: CompLog,
 };
+
+function CompCode({ palette, r }: CompProps) {
+  // Stylised code editor — line numbers + 8 lines of varying indent and tokens
+  const yStart = 56;
+  const lineH = 22;
+  const lineCount = 8;
+  const gutterX = 60;
+
+  // token colour vocabulary
+  const KW = palette.accent;
+  const ID = palette.primary;
+  const STR = "rgba(255, 255, 255, 0.55)";
+  const PUNCT = "rgba(255, 255, 255, 0.32)";
+  const COMMENT = palette.primary;
+
+  // a "language" of token sequences indexed by line type
+  const lineTypes = [
+    // function declaration
+    () => [
+      { w: 22, c: KW },
+      { w: 6, c: PUNCT },
+      { w: 38 + r() * 18, c: ID },
+      { w: 6, c: PUNCT },
+      { w: 16 + r() * 12, c: ID },
+      { w: 6, c: PUNCT },
+    ],
+    // assignment
+    () => [
+      { w: 16, c: KW },
+      { w: 30 + r() * 14, c: ID },
+      { w: 8, c: PUNCT },
+      { w: 40 + r() * 30, c: r() > 0.5 ? STR : ID },
+      { w: 4, c: PUNCT },
+    ],
+    // function call
+    () => [
+      { w: 36 + r() * 20, c: ID },
+      { w: 6, c: PUNCT },
+      { w: 24 + r() * 18, c: ID },
+      { w: 4, c: PUNCT },
+      { w: 4, c: PUNCT },
+    ],
+    // return / control
+    () => [
+      { w: 22 + r() * 8, c: KW },
+      { w: 36 + r() * 24, c: ID },
+      { w: 4, c: PUNCT },
+    ],
+    // comment
+    () => [
+      { w: 6, c: COMMENT },
+      { w: 60 + r() * 80, c: COMMENT, opacity: 0.5 },
+    ],
+    // import / using
+    () => [
+      { w: 28, c: KW },
+      { w: 60 + r() * 30, c: STR },
+      { w: 4, c: PUNCT },
+    ],
+  ];
+
+  // each line: indent level + which line type
+  const lineDefs = Array.from({ length: lineCount }).map((_, i) => {
+    let indent = 0;
+    if (i === 0) indent = 0;
+    else if (i === lineCount - 1) indent = 0;
+    else indent = Math.floor(r() * 3); // 0..2
+
+    const typeIdx = i === 0 ? 0 : Math.floor(r() * lineTypes.length);
+    return { indent, tokens: lineTypes[typeIdx]!() };
+  });
+
+  return (
+    <g>
+      {/* gutter */}
+      <line
+        x1={gutterX}
+        y1="44"
+        x2={gutterX}
+        y2={yStart + lineCount * lineH - 8}
+        stroke={palette.primaryDim}
+        strokeWidth="0.8"
+      />
+
+      {lineDefs.map((ld, i) => {
+        const baseX = gutterX + 14 + ld.indent * 14;
+        const y = yStart + i * lineH;
+        let cursor = baseX;
+        // safety: total width budget
+        const maxX = 440;
+        return (
+          <g key={i}>
+            <text
+              x={gutterX - 6}
+              y={y + 4}
+              textAnchor="end"
+              fontFamily="Plus Jakarta Sans, sans-serif"
+              fontSize="9"
+              fontWeight="500"
+              fill="rgba(255, 255, 255, 0.22)"
+            >
+              {i + 1}
+            </text>
+            {ld.tokens.map((t, j) => {
+              if (cursor + t.w > maxX) return null;
+              const rect = (
+                <rect
+                  key={j}
+                  x={cursor}
+                  y={y - 5}
+                  width={t.w}
+                  height="6"
+                  rx="1.5"
+                  fill={t.c}
+                  opacity={(t as { opacity?: number }).opacity ?? 0.85}
+                />
+              );
+              cursor += t.w + 6;
+              return rect;
+            })}
+          </g>
+        );
+      })}
+
+      {/* caret on the last visible line */}
+      <rect
+        x={gutterX + 14}
+        y={yStart + (lineCount - 1) * lineH - 6}
+        width="2"
+        height="9"
+        fill={palette.accent}
+      />
+    </g>
+  );
+}
+
+function CompChart({ palette, r }: CompProps) {
+  // line chart / time-series — 2 lines on a grid with axis ticks
+  const x0 = 60;
+  const y0 = 60;
+  const w = 360;
+  const h = 150;
+
+  // generate two smooth-ish series, deterministic from rng
+  const series = (offset: number, points: number, amplitude: number) => {
+    const pts: [number, number][] = [];
+    let lastY = y0 + h / 2;
+    for (let i = 0; i < points; i++) {
+      const t = i / (points - 1);
+      const target =
+        y0 +
+        h / 2 +
+        Math.sin(t * Math.PI * 2 + offset) * amplitude * 0.4 +
+        (r() - 0.5) * amplitude;
+      lastY = lastY * 0.4 + target * 0.6;
+      pts.push([x0 + t * w, lastY]);
+    }
+    return pts;
+  };
+
+  const a = series(r() * 6, 28, h * 0.4);
+  const b = series(r() * 6 + 1.5, 28, h * 0.35);
+
+  const toPath = (pts: [number, number][]) =>
+    pts.map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+
+  // area under series A
+  const areaA = `${toPath(a)} L ${x0 + w},${y0 + h} L ${x0},${y0 + h} Z`;
+
+  return (
+    <g>
+      {/* horizontal grid lines */}
+      {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
+        <line
+          key={i}
+          x1={x0}
+          y1={y0 + t * h}
+          x2={x0 + w}
+          y2={y0 + t * h}
+          stroke="rgba(255, 255, 255, 0.05)"
+          strokeWidth="1"
+        />
+      ))}
+      {/* y-axis */}
+      <line x1={x0} y1={y0} x2={x0} y2={y0 + h} stroke={palette.primaryDim} strokeWidth="0.8" />
+      {/* axis labels */}
+      {[0, 0.5, 1].map((t, i) => (
+        <text
+          key={`yl${i}`}
+          x={x0 - 6}
+          y={y0 + (1 - t) * h + 3}
+          textAnchor="end"
+          fontFamily="Plus Jakarta Sans, sans-serif"
+          fontSize="8"
+          fontWeight="500"
+          fill="rgba(255, 255, 255, 0.32)"
+        >
+          {Math.round(t * 100)}
+        </text>
+      ))}
+      {/* area under primary line */}
+      <path d={areaA} fill={palette.primaryDim} opacity="0.5" />
+      {/* secondary line */}
+      <path d={toPath(b)} stroke={palette.primary} strokeWidth="1.4" fill="none" strokeLinejoin="round" strokeLinecap="round" opacity="0.55" />
+      {/* primary line */}
+      <path d={toPath(a)} stroke={palette.accent} strokeWidth="2" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+      {/* data points on primary */}
+      {a.filter((_, i) => i % 4 === 0).map(([x, y], i) => (
+        <circle key={`p${i}`} cx={x} cy={y} r="2" fill={palette.accent} />
+      ))}
+    </g>
+  );
+}
+
+function CompLog({ palette, r }: CompProps) {
+  // log lines: timestamp + level chip + message
+  const yStart = 60;
+  const lineH = 18;
+  const lineCount = 9;
+
+  const LEVELS = [
+    { label: "INF", color: palette.primary, opacity: 0.5 },
+    { label: "WRN", color: palette.accent, opacity: 0.85 },
+    { label: "ERR", color: palette.accent, opacity: 1 },
+    { label: "DBG", color: "rgba(255, 255, 255, 0.4)", opacity: 0.7 },
+  ];
+
+  const lines = Array.from({ length: lineCount }).map((_, i) => {
+    const lvl = LEVELS[Math.floor(r() * LEVELS.length)]!;
+    return {
+      ts: `${(i + 9).toString().padStart(2, "0")}:${Math.floor(r() * 60).toString().padStart(2, "0")}:${Math.floor(r() * 60).toString().padStart(2, "0")}`,
+      level: lvl,
+      msgWidth: 80 + r() * 180,
+    };
+  });
+
+  return (
+    <g>
+      {lines.map((line, i) => {
+        const y = yStart + i * lineH;
+        return (
+          <g key={i}>
+            {/* timestamp */}
+            <text
+              x={56}
+              y={y + 4}
+              fontFamily="Plus Jakarta Sans, sans-serif"
+              fontSize="9"
+              fontWeight="500"
+              fill="rgba(255, 255, 255, 0.32)"
+              letterSpacing="0.04em"
+            >
+              {line.ts}
+            </text>
+            {/* level chip */}
+            <rect
+              x={108}
+              y={y - 6}
+              width="22"
+              height="11"
+              rx="2"
+              fill="none"
+              stroke={line.level.color}
+              strokeWidth="0.8"
+              opacity={line.level.opacity}
+            />
+            <text
+              x={119}
+              y={y + 2}
+              textAnchor="middle"
+              fontFamily="Plus Jakarta Sans, sans-serif"
+              fontSize="8"
+              fontWeight="700"
+              fill={line.level.color}
+              opacity={line.level.opacity}
+              letterSpacing="0.06em"
+            >
+              {line.level.label}
+            </text>
+            {/* message rectangle */}
+            <rect
+              x={138}
+              y={y - 4}
+              width={line.msgWidth}
+              height="6"
+              rx="1.5"
+              fill={line.level.color}
+              opacity={line.level.opacity * 0.6}
+            />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
 
 function CompPhone({ palette, r }: CompProps) {
   // a stylised phone with a screen showing app UI elements
