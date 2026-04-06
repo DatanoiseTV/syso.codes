@@ -86,7 +86,8 @@ type CompName =
   | "waveStack"
   | "diagonalFlow"
   | "pulse"
-  | "matrix";
+  | "matrix"
+  | "phone";
 
 function pickComposition({
   slug,
@@ -104,6 +105,13 @@ function pickComposition({
     .toLowerCase();
 
   // Order matters — most specific keywords first.
+
+  // Mobile / cross-platform apps → phone outline
+  if (
+    language?.toLowerCase() === "dart" ||
+    /(flutter|mobile|ios|android|iphone|ipad|tinyice-app)/.test(all)
+  )
+    return "phone";
 
   // FPGA / gateware → fabric grid
   if (/(fpga|ecp5|lattice|verilog|vhdl|gateware|litex|migen|colorlight|hdl)/.test(all))
@@ -636,4 +644,114 @@ const COMPOSITIONS: Record<CompName, (p: CompProps) => JSX.Element> = {
   diagonalFlow: CompDiagonalFlow,
   pulse: CompPulse,
   matrix: CompMatrix,
+  phone: CompPhone,
 };
+
+function CompPhone({ palette, r }: CompProps) {
+  // a stylised phone with a screen showing app UI elements
+  const tilt = (r() - 0.5) * 8; // -4..4 deg
+  // device geometry
+  const w = 124;
+  const h = 220;
+  const cx = 240;
+  const cy = 142;
+  const x = cx - w / 2;
+  const y = cy - h / 2;
+  return (
+    <g transform={`rotate(${tilt.toFixed(1)} ${cx} ${cy})`}>
+      {/* outer body */}
+      <rect
+        x={x - 2}
+        y={y - 2}
+        width={w + 4}
+        height={h + 4}
+        rx="22"
+        fill="#0a0a0a"
+        stroke={palette.primary}
+        strokeWidth="1.4"
+      />
+      {/* inner bezel */}
+      <rect
+        x={x + 4}
+        y={y + 4}
+        width={w - 8}
+        height={h - 8}
+        rx="18"
+        fill="#000000"
+        stroke={palette.primaryDim}
+        strokeWidth="0.8"
+      />
+      {/* notch */}
+      <rect x={cx - 18} y={y + 6} width="36" height="6" rx="3" fill="#0a0a0a" />
+      {/* status bar */}
+      <rect x={x + 12} y={y + 18} width="20" height="3" rx="1.5" fill={palette.primary} opacity="0.6" />
+      <circle cx={x + w - 18} cy={y + 19.5} r="2" fill={palette.accent} />
+      {/* big "now playing" hero card */}
+      <rect
+        x={x + 12}
+        y={y + 30}
+        width={w - 24}
+        height="50"
+        rx="6"
+        fill={palette.primaryDim}
+        stroke={palette.primary}
+        strokeWidth="0.8"
+      />
+      <circle cx={x + 26} cy={y + 55} r="9" fill={palette.accent} opacity="0.85" />
+      <rect x={x + 40} y={y + 47} width="48" height="3" rx="1.5" fill={palette.primary} opacity="0.9" />
+      <rect x={x + 40} y={y + 56} width="34" height="2" rx="1" fill={palette.primary} opacity="0.55" />
+      {/* list rows */}
+      {[0, 1, 2, 3].map((i) => (
+        <g key={i}>
+          <rect
+            x={x + 12}
+            y={y + 92 + i * 22}
+            width="14"
+            height="14"
+            rx="2"
+            fill={palette.primary}
+            opacity={0.18 + i * 0.04}
+          />
+          <rect
+            x={x + 32}
+            y={y + 96 + i * 22}
+            width={70 - i * 6}
+            height="2.5"
+            rx="1.25"
+            fill={palette.primary}
+            opacity="0.7"
+          />
+          <rect
+            x={x + 32}
+            y={y + 102 + i * 22}
+            width={50 - i * 4}
+            height="2"
+            rx="1"
+            fill={palette.primary}
+            opacity="0.4"
+          />
+        </g>
+      ))}
+      {/* bottom transport bar */}
+      <rect
+        x={x + 12}
+        y={y + h - 30}
+        width={w - 24}
+        height="18"
+        rx="9"
+        fill="#0a0a0a"
+        stroke={palette.primaryDim}
+        strokeWidth="0.8"
+      />
+      <circle cx={cx} cy={y + h - 21} r="5" fill={palette.accent} />
+      <polygon
+        points={`${cx - 1.5},${y + h - 23.5} ${cx + 2},${y + h - 21} ${cx - 1.5},${y + h - 18.5}`}
+        fill="#0a0a0a"
+      />
+      <circle cx={cx - 22} cy={y + h - 21} r="2.5" fill={palette.primary} opacity="0.6" />
+      <circle cx={cx + 22} cy={y + h - 21} r="2.5" fill={palette.primary} opacity="0.6" />
+      {/* home indicator */}
+      <rect x={cx - 18} y={y + h - 9} width="36" height="2" rx="1" fill={palette.primary} opacity="0.4" />
+    </g>
+  );
+}

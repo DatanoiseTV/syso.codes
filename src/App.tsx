@@ -3,6 +3,7 @@ import { projects as curated } from "./data/projects";
 import { autoProjects, pushedDates } from "./data/autoProjects";
 import { Hero } from "./components/Hero";
 import { About } from "./components/About";
+import { CommitActivity } from "./components/CommitActivity";
 import { FeaturedProject } from "./components/FeaturedProject";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { Footer } from "./components/Footer";
@@ -43,6 +44,7 @@ export default function App() {
       <Nav />
       <Hero publicRepos={GH_PUBLIC_REPOS} totalStars={GH_TOTAL_STARS} />
       <About />
+      <CommitActivity />
 
       <section id="featured" className="featured-section">
         <div className="section-head">
@@ -80,6 +82,7 @@ function Nav() {
       </a>
       <div className="nav__links">
         <a href="#about">About</a>
+        <a href="#activity">Activity</a>
         <a href="#featured">Featured</a>
         <a href="#projects">All projects</a>
         <a href="https://github.com/DatanoiseTV" target="_blank" rel="noreferrer">
