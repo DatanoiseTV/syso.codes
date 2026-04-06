@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+*.log
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# tsc artifacts that shouldn't be checked in (Vite handles its own config)
+vite.config.d.ts
+vite.config.js
