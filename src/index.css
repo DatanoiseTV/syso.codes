@@ -11,10 +11,10 @@
   --border-strong: rgba(255, 255, 255, 0.14);
   --border-glow: rgba(255, 107, 53, 0.22);
 
-  /* text — pure white headings, neutral greys, no colour tint */
+  /* text — pure white headings, neutral greys, all AA-compliant on #000 */
   --text: #ffffff;
-  --text-dim: #a3a3a3;
-  --text-faint: #595959;
+  --text-dim: #b3b3b3;
+  --text-faint: #888888;
 
   /* accent — single warm orange, used sparingly */
   --accent: #ff6b35;
@@ -268,6 +268,13 @@ body::before {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-dim);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav__links li {
+  list-style: none;
 }
 
 .nav__links a {
@@ -285,7 +292,7 @@ body::before {
   .nav__links {
     gap: 18px;
   }
-  .nav__links a:nth-child(1) {
+  .nav__links li:nth-child(1) {
     display: none;
   }
 }

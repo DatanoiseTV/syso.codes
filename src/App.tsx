@@ -39,34 +39,36 @@ export default function App() {
   );
 
   return (
-    <div className="app">
+    <div className="app" id="top">
       <BackgroundAnimations />
       <Nav />
-      <Hero publicRepos={GH_PUBLIC_REPOS} totalStars={GH_TOTAL_STARS} />
-      <About />
-      <CommitActivity />
+      <main id="main">
+        <Hero publicRepos={GH_PUBLIC_REPOS} totalStars={GH_TOTAL_STARS} />
+        <About />
+        <CommitActivity />
 
-      <section id="featured" className="featured-section">
-        <div className="section-head">
-          <div>
-            <p className="section-eyebrow">Highlights</p>
-            <h2 className="section-title">Projects worth a closer look.</h2>
-            <p className="section-blurb">
-              A handful of recent builds — audio servers, native macOS tools,
-              an AI-assisted DSP lab, hardware development boards, an analog-modeled
-              VST plugin, and embedded systems where the firmware does most of
-              the talking.
-            </p>
+        <section id="featured" className="featured-section" aria-labelledby="featured-title">
+          <div className="section-head">
+            <div>
+              <p className="section-eyebrow">Highlights</p>
+              <h2 className="section-title" id="featured-title">Projects worth a closer look.</h2>
+              <p className="section-blurb">
+                A handful of recent builds — audio servers, native macOS tools,
+                an AI-assisted DSP lab, hardware development boards, an analog-modeled
+                VST plugin, and embedded systems where the firmware does most of
+                the talking.
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="featured-list">
-          {featured.map((p, i) => (
-            <FeaturedProject key={p.slug} project={p} hero={i === 0} />
-          ))}
-        </div>
-      </section>
+          <div className="featured-list">
+            {featured.map((p, i) => (
+              <FeaturedProject key={p.slug} project={p} hero={i === 0} />
+            ))}
+          </div>
+        </section>
 
-      <ProjectGrid projects={allProjects} />
+        <ProjectGrid projects={allProjects} />
+      </main>
 
       <Footer />
     </div>
@@ -75,20 +77,27 @@ export default function App() {
 
 function Nav() {
   return (
-    <nav className="nav">
-      <a className="nav__brand" href="#top">
+    <nav className="nav" aria-label="Main navigation">
+      <a className="nav__brand" href="#top" aria-label="syso.codes home">
         <BrandMark />
         syso<span className="nav__brand-dot">.</span>codes
       </a>
-      <div className="nav__links">
-        <a href="#about">About</a>
-        <a href="#activity">Activity</a>
-        <a href="#featured">Featured</a>
-        <a href="#projects">All projects</a>
-        <a href="https://github.com/DatanoiseTV" target="_blank" rel="noreferrer">
-          GitHub →
-        </a>
-      </div>
+      <ul className="nav__links" role="list">
+        <li><a href="#about">About</a></li>
+        <li><a href="#activity">Activity</a></li>
+        <li><a href="#featured">Featured</a></li>
+        <li><a href="#projects">All projects</a></li>
+        <li>
+          <a
+            href="https://github.com/DatanoiseTV"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="DatanoiseTV on GitHub (opens in new tab)"
+          >
+            GitHub →
+          </a>
+        </li>
+      </ul>
     </nav>
   );
 }

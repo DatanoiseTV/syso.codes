@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
     <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Best practices: CSP, frame-ancestors, permissions -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https://avatars.githubusercontent.com https://*.githubusercontent.com https://github.com; connect-src 'self'; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+    />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=(), payment=()" />
 
     <!-- Primary -->
     <title>syso.codes — Sylwester (DatanoiseTV) · embedded audio, DSP, FPGA, macOS</title>
@@ -60,15 +70,11 @@
     <!-- Sitemap + RSS hints -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
-    <!-- Preconnect / preload -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preconnect / DNS prefetch — fonts are self-hosted via fontsource -->
     <link rel="dns-prefetch" href="https://github.com" />
     <link rel="dns-prefetch" href="https://avatars.githubusercontent.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
+    <link rel="dns-prefetch" href="https://user-images.githubusercontent.com" />
 
     <!-- ─── Structured data: Person ─── -->
     <script type="application/ld+json">
