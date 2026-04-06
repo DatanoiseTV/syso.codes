@@ -178,79 +178,119 @@ function ViewToggle({
   );
 }
 
+function detailUrl(slug: string): string {
+  return `/projects/${slug}/`;
+}
+
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <a className="card" href={project.url} target="_blank" rel="noreferrer">
-      <div className="card__media">
-        {project.image ? (
-          <img src={project.image} alt={`${project.name} preview`} loading="lazy" decoding="async" />
-        ) : (
-          <ProjectArt
-            type={project.art ?? "auto"}
-            slug={project.slug}
-            category={project.category}
-            language={project.language}
-            topics={project.topics}
-            className="card__svg"
-          />
-        )}
-      </div>
-      <div className="card__body">
-        <div className="card__meta">
-          <span className="chip chip--lang">{project.language}</span>
-          {project.stars > 0 && <span className="chip chip--stars">★ {project.stars}</span>}
+    <article className="card-wrap">
+      <a className="card" href={detailUrl(project.slug)} aria-label={`${project.name} — ${project.tagline}`}>
+        <div className="card__media">
+          {project.image ? (
+            <img src={project.image} alt={`${project.name} preview`} loading="lazy" decoding="async" />
+          ) : (
+            <ProjectArt
+              type={project.art ?? "auto"}
+              slug={project.slug}
+              category={project.category}
+              language={project.language}
+              topics={project.topics}
+              className="card__svg"
+            />
+          )}
         </div>
-        <h3 className="card__name">{project.name}</h3>
-        <p className="card__tagline">{project.tagline}</p>
-        <p className="card__desc">{project.description}</p>
-        <div className="card__topics">
-          {project.topics.slice(0, 4).map((t) => (
-            <span key={t} className="topic">
-              #{t}
-            </span>
-          ))}
+        <div className="card__body">
+          <div className="card__meta">
+            <span className="chip chip--lang">{project.language}</span>
+            {project.stars > 0 && <span className="chip chip--stars">★ {project.stars}</span>}
+          </div>
+          <h3 className="card__name">{project.name}</h3>
+          <p className="card__tagline">{project.tagline}</p>
+          <p className="card__desc">{project.description}</p>
+          <div className="card__topics">
+            {project.topics.slice(0, 4).map((t) => (
+              <span key={t} className="topic">
+                #{t}
+              </span>
+            ))}
+          </div>
+          <div className="card__footer">
+            <span className="card__category">{categoryLabel(project.category)}</span>
+            <span className="card__arrow" aria-hidden="true">→</span>
+          </div>
         </div>
-        <div className="card__footer">
-          <span className="card__category">{categoryLabel(project.category)}</span>
-          <span className="card__arrow" aria-hidden="true">→</span>
-        </div>
-      </div>
-    </a>
+      </a>
+      <a
+        className="card__github"
+        href={project.url}
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label={`${project.name} on GitHub (opens in new tab)`}
+        title="View on GitHub"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GitHubIcon />
+      </a>
+    </article>
   );
 }
 
 function ProjectRow({ project }: { project: Project }) {
   return (
-    <a className="row" href={project.url} target="_blank" rel="noreferrer">
-      <div className="row__media">
-        {project.image ? (
-          <img src={project.image} alt="" loading="lazy" decoding="async" />
-        ) : (
-          <ProjectArt
-            type={project.art ?? "auto"}
-            slug={project.slug}
-            category={project.category}
-            language={project.language}
-            topics={project.topics}
-            className="row__svg"
-          />
-        )}
-      </div>
-      <div className="row__main">
-        <div className="row__top">
-          <h3 className="row__name">{project.name}</h3>
-          <span className="row__tagline">{project.tagline}</span>
+    <div className="row-wrap">
+      <a className="row" href={detailUrl(project.slug)} aria-label={`${project.name} — ${project.tagline}`}>
+        <div className="row__media">
+          {project.image ? (
+            <img src={project.image} alt="" loading="lazy" decoding="async" />
+          ) : (
+            <ProjectArt
+              type={project.art ?? "auto"}
+              slug={project.slug}
+              category={project.category}
+              language={project.language}
+              topics={project.topics}
+              className="row__svg"
+            />
+          )}
         </div>
-        <p className="row__desc">{project.description}</p>
-      </div>
-      <div className="row__meta">
-        <span className="chip chip--lang">{project.language}</span>
-        {project.stars > 0 && <span className="chip chip--stars">★ {project.stars}</span>}
-        <span className="chip">{categoryLabel(project.category)}</span>
-      </div>
-      <span className="row__arrow" aria-hidden="true">
-        →
-      </span>
-    </a>
+        <div className="row__main">
+          <div className="row__top">
+            <h3 className="row__name">{project.name}</h3>
+            <span className="row__tagline">{project.tagline}</span>
+          </div>
+          <p className="row__desc">{project.description}</p>
+        </div>
+        <div className="row__meta">
+          <span className="chip chip--lang">{project.language}</span>
+          {project.stars > 0 && <span className="chip chip--stars">★ {project.stars}</span>}
+          <span className="chip">{categoryLabel(project.category)}</span>
+        </div>
+        <span className="row__arrow" aria-hidden="true">
+          →
+        </span>
+      </a>
+      <a
+        className="row__github"
+        href={project.url}
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label={`${project.name} on GitHub (opens in new tab)`}
+        title="View on GitHub"
+      >
+        <GitHubIcon />
+      </a>
+    </div>
+  );
+}
+
+function GitHubIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+      />
+    </svg>
   );
 }
