@@ -19,11 +19,23 @@ const FILTERS: { label: string; value: Category | "all" }[] = [
 ];
 
 const PAGE_SIZE = 24;
+type ViewMode = "grid" | "list";
 
 export function ProjectGrid({ projects }: Props) {
   const [filter, setFilter] = useState<Category | "all">("all");
+  const [view, setView] = useState<ViewMode>(() => {
+    if (typeof window === "undefined") return "grid";
+    return (localStorage.getItem("syso.view") as ViewMode) || "grid";
+  });
   const [visible, setVisible] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // persist view preference
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("syso.view", view);
+    }
+  }, [view]);
 
   const filtered = useMemo(() => {
     const list =
@@ -75,24 +87,37 @@ export function ProjectGrid({ projects }: Props) {
             AI-assisted weirdness. Scroll to load more.
           </p>
         </div>
-        <div className="filter-bar">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              type="button"
-              className={`filter-pill${filter === f.value ? " filter-pill--active" : ""}`}
-              onClick={() => setFilter(f.value)}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="grid-controls">
+          <ViewToggle view={view} onChange={setView} />
+          <div className="filter-bar">
+            {FILTERS.map((f) => (
+              <button
+                key={f.value}
+                type="button"
+                className={`filter-pill${filter === f.value ? " filter-pill--active" : ""}`}
+                onClick={() => setFilter(f.value)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      <div className="grid">
-        {shown.map((p) => (
-          <ProjectCard key={p.slug} project={p} />
-        ))}
-      </div>
+
+      {view === "grid" ? (
+        <div className="grid">
+          {shown.map((p) => (
+            <ProjectCard key={p.slug} project={p} />
+          ))}
+        </div>
+      ) : (
+        <div className="list">
+          {shown.map((p) => (
+            <ProjectRow key={p.slug} project={p} />
+          ))}
+        </div>
+      )}
+
       <div ref={sentinelRef} className="grid-sentinel" aria-hidden="true">
         {remaining > 0 ? (
           <span className="grid-sentinel__label">Loading {Math.min(PAGE_SIZE, remaining)} more…</span>
@@ -103,6 +128,53 @@ export function ProjectGrid({ projects }: Props) {
         )}
       </div>
     </section>
+  );
+}
+
+function ViewToggle({
+  view,
+  onChange,
+}: {
+  view: ViewMode;
+  onChange: (v: ViewMode) => void;
+}) {
+  return (
+    <div className="view-toggle" role="radiogroup" aria-label="View mode">
+      <button
+        type="button"
+        className={`view-toggle__btn${view === "grid" ? " view-toggle__btn--active" : ""}`}
+        onClick={() => onChange("grid")}
+        role="radio"
+        aria-checked={view === "grid"}
+        aria-label="Grid view"
+        title="Grid view"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4" />
+          <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4" />
+          <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4" />
+          <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.4" />
+        </svg>
+        <span>Grid</span>
+      </button>
+      <button
+        type="button"
+        className={`view-toggle__btn${view === "list" ? " view-toggle__btn--active" : ""}`}
+        onClick={() => onChange("list")}
+        role="radio"
+        aria-checked={view === "list"}
+        aria-label="List view"
+        title="List view"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="1" y="2" width="3" height="3" rx="0.6" fill="currentColor" />
+          <rect x="6" y="2.5" width="7" height="2" rx="1" fill="currentColor" />
+          <rect x="1" y="7" width="3" height="3" rx="0.6" fill="currentColor" />
+          <rect x="6" y="7.5" width="7" height="2" rx="1" fill="currentColor" />
+        </svg>
+        <span>List</span>
+      </button>
+    </div>
   );
 }
 
@@ -143,6 +215,42 @@ function ProjectCard({ project }: { project: Project }) {
           <span className="card__arrow" aria-hidden="true">→</span>
         </div>
       </div>
+    </a>
+  );
+}
+
+function ProjectRow({ project }: { project: Project }) {
+  return (
+    <a className="row" href={project.url} target="_blank" rel="noreferrer">
+      <div className="row__media">
+        {project.image ? (
+          <img src={project.image} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <ProjectArt
+            type={project.art ?? "auto"}
+            slug={project.slug}
+            category={project.category}
+            language={project.language}
+            topics={project.topics}
+            className="row__svg"
+          />
+        )}
+      </div>
+      <div className="row__main">
+        <div className="row__top">
+          <h3 className="row__name">{project.name}</h3>
+          <span className="row__tagline">{project.tagline}</span>
+        </div>
+        <p className="row__desc">{project.description}</p>
+      </div>
+      <div className="row__meta">
+        <span className="chip chip--lang">{project.language}</span>
+        {project.stars > 0 && <span className="chip chip--stars">★ {project.stars}</span>}
+        <span className="chip">{categoryLabel(project.category)}</span>
+      </div>
+      <span className="row__arrow" aria-hidden="true">
+        →
+      </span>
     </a>
   );
 }
