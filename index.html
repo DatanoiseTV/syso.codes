@@ -2,20 +2,156 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sylwester (syso / DatanoiseTV) — embedded audio, DSP, FPGA, macOS native, and Linux audio open-source projects." />
-    <meta name="theme-color" content="#0a0e1a" />
-    <meta property="og:title" content="syso.codes — Embedded audio, DSP & FPGA" />
-    <meta property="og:description" content="Open-source projects in audio-over-IP, DSP, FPGA gateware, ESP32, and native macOS tooling." />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- Primary -->
+    <title>syso.codes — Sylwester (DatanoiseTV) · embedded audio, DSP, FPGA, macOS</title>
+    <meta
+      name="description"
+      content="Open-source projects by Sylwester (DatanoiseTV), Berlin-based engineer working on embedded audio firmware, FPGA gateware, DSP languages, low-latency network audio (AES67/RAVENNA/ADAT), native macOS apps, and audio plugins. 245 public repos, 1k+ GitHub stars."
+    />
+    <meta
+      name="keywords"
+      content="Sylwester, DatanoiseTV, syso, syso.codes, embedded audio, audio DSP, FPGA, ESP32, ESP32-P4, RP2040, RP2350, PicoADK, AES67, RAVENNA, ADAT, JACK, Linux audio, Vult DSP, macOS audio, VST3, AU, LV2, audio plugin, eurorack, MIDI, network audio, Berlin developer, open source, github"
+    />
+    <meta name="author" content="Sylwester (DatanoiseTV)" />
+    <meta name="creator" content="Sylwester" />
+    <meta name="publisher" content="Sylwester" />
+    <meta name="generator" content="Vite + React" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://syso.codes/" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="mask-icon" href="/favicon.svg" color="#ff6b35" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="syso.codes" />
+    <meta property="og:title" content="syso.codes — Embedded audio, DSP, FPGA & native macOS by DatanoiseTV" />
+    <meta
+      property="og:description"
+      content="Sylwester (DatanoiseTV) — Berlin-based engineer. Open-source firmware for ESP32 / RP2040 / FPGA, AES67/RAVENNA audio-over-IP, the PicoADK audio dev board, native macOS audio apps, JUCE plugins, and DSP tooling."
+    />
+    <meta property="og:url" content="https://syso.codes/" />
+    <meta property="og:image" content="https://syso.codes/og.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="syso.codes — embedded audio, DSP, FPGA, native macOS" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="profile:first_name" content="Sylwester" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="syso.codes — Embedded audio, DSP, FPGA, native macOS" />
+    <meta
+      name="twitter:description"
+      content="Sylwester (DatanoiseTV). Berlin. ESP32/RP2040/FPGA firmware, AES67 audio-over-IP, PicoADK hardware, native macOS audio apps, JUCE plugins, DSP languages."
+    />
+    <meta name="twitter:image" content="https://syso.codes/og.svg" />
+    <meta name="twitter:image:alt" content="syso.codes — embedded audio, DSP, FPGA, native macOS" />
+    <meta name="twitter:creator" content="@DatanoiseTV" />
+
+    <!-- Sitemap + RSS hints -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <!-- Preconnect / preload -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <title>syso.codes — Sylwester / DatanoiseTV</title>
+    <link rel="dns-prefetch" href="https://github.com" />
+    <link rel="dns-prefetch" href="https://avatars.githubusercontent.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- ─── Structured data: Person ─── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": "https://syso.codes/#person",
+        "name": "Sylwester",
+        "alternateName": ["DatanoiseTV", "syso"],
+        "url": "https://syso.codes/",
+        "image": "https://avatars.githubusercontent.com/u/6614616",
+        "sameAs": [
+          "https://github.com/DatanoiseTV",
+          "https://syso.name"
+        ],
+        "jobTitle": "Software & Hardware Engineer",
+        "description": "Berlin-based engineer working on embedded audio firmware, FPGA gateware, DSP languages, low-latency network audio, native macOS apps and audio plugins.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Berlin",
+          "addressCountry": "DE"
+        },
+        "knowsAbout": [
+          "Embedded systems",
+          "Audio DSP",
+          "FPGA gateware",
+          "ESP32",
+          "RP2040",
+          "AES67",
+          "RAVENNA",
+          "ADAT",
+          "JACK Audio",
+          "Linux audio",
+          "Vult DSP language",
+          "macOS application development",
+          "Swift",
+          "VST3",
+          "Audio Unit",
+          "LV2",
+          "JUCE",
+          "Eurorack",
+          "MIDI",
+          "DevOps"
+        ],
+        "knowsLanguage": ["en", "de", "pl"]
+      }
+    </script>
+
+    <!-- ─── Structured data: WebSite ─── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://syso.codes/#website",
+        "url": "https://syso.codes/",
+        "name": "syso.codes",
+        "description": "Sylwester (DatanoiseTV) — open-source projects in embedded audio, DSP, FPGA, network audio and native macOS.",
+        "inLanguage": "en-US",
+        "publisher": { "@id": "https://syso.codes/#person" },
+        "author": { "@id": "https://syso.codes/#person" }
+      }
+    </script>
+
+    <!-- ─── Structured data: ProfilePage ─── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "@id": "https://syso.codes/#profilepage",
+        "url": "https://syso.codes/",
+        "mainEntity": { "@id": "https://syso.codes/#person" },
+        "about": { "@id": "https://syso.codes/#person" },
+        "name": "Sylwester · DatanoiseTV — Portfolio",
+        "isPartOf": { "@id": "https://syso.codes/#website" }
+      }
+    </script>
+
+    <!-- ─── ITemList placeholder — replaced by scripts/seo-inject.mjs at build time ─── -->
+    <!--SEO_ITEM_LIST-->
   </head>
   <body>
     <div id="root"></div>
+    <!--SEO_NOSCRIPT-->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
