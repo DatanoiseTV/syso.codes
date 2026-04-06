@@ -8,6 +8,7 @@ dist-ssr
 
 # TypeScript build cache
 *.tsbuildinfo
+.tsbuild/
 
 # tsc artifacts that shouldn't be checked in (Vite handles its own config)
 vite.config.d.ts
