@@ -90,7 +90,8 @@ type CompName =
   | "phone"
   | "code"
   | "chart"
-  | "log";
+  | "log"
+  | "midi";
 
 function pickComposition({
   slug,
@@ -131,8 +132,11 @@ function pickComposition({
   if (/(find3|location|indoor|positioning|nrf24|rf|wireless|mesh|airplay)/.test(all))
     return "concentric";
 
-  // MIDI / SysEx / clock pulses → pulse train
-  if (/(midi|sysex|turbomidi|metronome|clock-out|gate|arpeggi)/.test(all)) return "pulse";
+  // MIDI / SysEx → DIN socket + piano roll
+  if (/(midi|sysex|turbomidi|midiusb|usb-midi)/.test(all)) return "midi";
+
+  // Metronome / arpeggiator / gate / clock-out → square pulse train
+  if (/(metronome|clock-out|gate|arpeggi|click|tempo)/.test(all)) return "pulse";
 
   // Network audio / IP audio / streaming → node constellation
   if (/(aes67|ravenna|usbip|usb-ip|rtp|ptp|ieee.1588|jack-link|streaming|icecast|webrtc|tinyice|airplay|network-audio)/.test(all))
@@ -662,7 +666,177 @@ const COMPOSITIONS: Record<CompName, (p: CompProps) => JSX.Element> = {
   code: CompCode,
   chart: CompChart,
   log: CompLog,
+  midi: CompMidi,
 };
+
+function CompMidi({ palette, r }: CompProps) {
+  // 5-pin DIN socket on the left, piano roll on the right
+  const cx = 92;
+  const cy = 130;
+  const dinR = 40;
+
+  // 5-pin DIN layout (looking at the front of the female socket):
+  //          2 (top, shield)
+  //   4              5
+  //     1        3
+  // angles measured from straight up
+  const pinAngles = [
+    { a: -Math.PI / 2, dist: 0.55 }, // pin 2 — top
+    { a: -Math.PI / 2 - Math.PI * 0.4, dist: 0.6 }, // pin 4
+    { a: -Math.PI / 2 + Math.PI * 0.4, dist: 0.6 }, // pin 5
+    { a: -Math.PI / 2 - Math.PI * 0.72, dist: 0.55 }, // pin 1
+    { a: -Math.PI / 2 + Math.PI * 0.72, dist: 0.55 }, // pin 3
+  ];
+
+  // piano roll grid
+  const rollX = 168;
+  const rollY = 56;
+  const rollW = 272;
+  const rollH = 148;
+  const lanes = 10;
+  const laneH = rollH / lanes;
+
+  // notes — at least one per row, varied widths and positions
+  const notes: { lane: number; x: number; w: number; accent: boolean }[] = [];
+  for (let lane = 0; lane < lanes; lane++) {
+    const noteCount = 1 + Math.floor(r() * 3); // 1..3 notes per lane
+    let cursor = rollX + 4;
+    for (let n = 0; n < noteCount; n++) {
+      const w = 14 + r() * 38;
+      const gap = 6 + r() * 24;
+      if (cursor + w > rollX + rollW - 4) break;
+      notes.push({
+        lane,
+        x: cursor,
+        w,
+        accent: r() > 0.78,
+      });
+      cursor += w + gap;
+    }
+  }
+
+  return (
+    <g>
+      {/* ─── DIN socket ─── */}
+      {/* outer body */}
+      <circle cx={cx} cy={cy} r={dinR + 4} fill="#0a0a0a" stroke={palette.primary} strokeWidth="1.4" />
+      {/* inner socket */}
+      <circle cx={cx} cy={cy} r={dinR} fill="#000000" stroke={palette.primaryDim} strokeWidth="0.8" />
+      {/* alignment notch */}
+      <rect x={cx - 4} y={cy + dinR - 4} width="8" height="6" rx="1" fill="#0a0a0a" stroke={palette.primaryDim} strokeWidth="0.6" />
+
+      {/* 5 pins */}
+      {pinAngles.map((p, i) => {
+        const px = cx + Math.cos(p.a) * dinR * p.dist;
+        const py = cy + Math.sin(p.a) * dinR * p.dist;
+        return (
+          <g key={i}>
+            <circle cx={px} cy={py} r="4.5" fill="#0a0a0a" stroke={palette.primary} strokeWidth="0.8" />
+            <circle cx={px} cy={py} r="2" fill={palette.accent} />
+            <text
+              x={px}
+              y={py + 14}
+              textAnchor="middle"
+              fontFamily="Plus Jakarta Sans, sans-serif"
+              fontSize="7"
+              fontWeight="600"
+              fill="rgba(255, 255, 255, 0.32)"
+            >
+              {[2, 4, 5, 1, 3][i]}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* DIN label */}
+      <text
+        x={cx}
+        y={cy + dinR + 28}
+        textAnchor="middle"
+        fontFamily="Plus Jakarta Sans, sans-serif"
+        fontSize="9"
+        fontWeight="600"
+        fill={palette.primary}
+        opacity="0.85"
+        letterSpacing="0.06em"
+      >
+        DIN-5
+      </text>
+
+      {/* ─── Piano roll ─── */}
+      {/* roll background frame */}
+      <rect
+        x={rollX}
+        y={rollY}
+        width={rollW}
+        height={rollH}
+        rx="3"
+        fill="#000000"
+        stroke={palette.primaryDim}
+        strokeWidth="0.8"
+      />
+      {/* horizontal lane lines */}
+      {Array.from({ length: lanes - 1 }).map((_, i) => (
+        <line
+          key={`l${i}`}
+          x1={rollX}
+          y1={rollY + (i + 1) * laneH}
+          x2={rollX + rollW}
+          y2={rollY + (i + 1) * laneH}
+          stroke="rgba(255, 255, 255, 0.04)"
+          strokeWidth="1"
+        />
+      ))}
+      {/* black-key shading every other lane (rough piano feel) */}
+      {[1, 3, 6, 8, 10].map((i) =>
+        i < lanes ? (
+          <rect
+            key={`bk${i}`}
+            x={rollX}
+            y={rollY + i * laneH}
+            width={rollW}
+            height={laneH}
+            fill="rgba(255, 255, 255, 0.025)"
+          />
+        ) : null
+      )}
+      {/* vertical bar lines (4 bars) */}
+      {[0.25, 0.5, 0.75].map((t, i) => (
+        <line
+          key={`v${i}`}
+          x1={rollX + t * rollW}
+          y1={rollY}
+          x2={rollX + t * rollW}
+          y2={rollY + rollH}
+          stroke="rgba(255, 255, 255, 0.05)"
+          strokeWidth="1"
+        />
+      ))}
+      {/* notes */}
+      {notes.map((n, i) => (
+        <rect
+          key={i}
+          x={n.x}
+          y={rollY + n.lane * laneH + 2}
+          width={n.w}
+          height={laneH - 4}
+          rx="1.5"
+          fill={n.accent ? palette.accent : palette.primary}
+          opacity={n.accent ? 0.95 : 0.7}
+        />
+      ))}
+      {/* playhead — vertical orange line */}
+      <line
+        x1={rollX + rollW * 0.42}
+        y1={rollY - 2}
+        x2={rollX + rollW * 0.42}
+        y2={rollY + rollH + 2}
+        stroke={palette.accent}
+        strokeWidth="1.4"
+      />
+    </g>
+  );
+}
 
 function CompCode({ palette, r }: CompProps) {
   // Stylised code editor — line numbers + 8 lines of varying indent and tokens
