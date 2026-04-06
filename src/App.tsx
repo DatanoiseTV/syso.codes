@@ -13,7 +13,6 @@ import { BackgroundAnimations } from "./components/BackgroundAnimations";
 // `gh api users/DatanoiseTV` directly.
 const GH_PUBLIC_REPOS = 245;
 const GH_TOTAL_STARS = 1077;
-const GH_FOLLOWERS = 175;
 
 export default function App() {
   const allProjects = useMemo(() => {
@@ -42,11 +41,7 @@ export default function App() {
     <div className="app">
       <BackgroundAnimations />
       <Nav />
-      <Hero
-        publicRepos={GH_PUBLIC_REPOS}
-        totalStars={GH_TOTAL_STARS}
-        followers={GH_FOLLOWERS}
-      />
+      <Hero publicRepos={GH_PUBLIC_REPOS} totalStars={GH_TOTAL_STARS} />
       <About />
 
       <section id="featured" className="featured-section">

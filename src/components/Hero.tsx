@@ -1,10 +1,9 @@
 interface Props {
   publicRepos: number;
   totalStars: number;
-  followers: number;
 }
 
-export function Hero({ publicRepos, totalStars, followers }: Props) {
+export function Hero({ publicRepos, totalStars }: Props) {
   return (
     <header className="hero">
       <div className="hero__inner">
@@ -24,19 +23,18 @@ export function Hero({ publicRepos, totalStars, followers }: Props) {
           low-latency network audio and native macOS apps. Most of it lives
           on GitHub, and most of it is open source.
         </p>
-        <div className="hero__stats">
-          <Stat label="Public repos on GitHub" value={publicRepos.toLocaleString()} />
-          <Stat label="Total stars earned" value={totalStars.toLocaleString()} />
-          <Stat label="Followers" value={followers.toLocaleString()} />
-          <Stat label="Stack" value="C · C++ · Go · Swift · Verilog · TS · Asm" wide />
-        </div>
         <div className="hero__cta">
           <a className="btn btn--primary" href="https://github.com/DatanoiseTV" target="_blank" rel="noreferrer">
             github.com/DatanoiseTV →
           </a>
           <a className="btn btn--ghost" href="#projects">
-            Browse the lab ↓
+            Explore the Projects ↓
           </a>
+        </div>
+        <div className="hero__stats">
+          <Stat label="Public repos" value={publicRepos.toLocaleString()} />
+          <Stat label="Stars across them" value={totalStars.toLocaleString()} />
+          <Stat label="Languages I ship in" value="C · C++ · Go · Swift · Verilog · Asm" wide />
         </div>
       </div>
       <HeroBackground />
