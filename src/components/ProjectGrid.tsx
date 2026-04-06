@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Category, Project } from "../types";
-import { ProjectArt } from "./ProjectArt";
+import { ProjectImage } from "./ProjectImage";
 import { categoryLabel } from "./FeaturedProject";
 
 interface Props {
@@ -187,18 +187,10 @@ function ProjectCard({ project }: { project: Project }) {
     <article className="card-wrap">
       <a className="card" href={detailUrl(project.slug)} aria-label={`${project.name} — ${project.tagline}`}>
         <div className="card__media">
-          {project.image ? (
-            <img src={project.image} alt={`${project.name} preview`} loading="lazy" decoding="async" />
-          ) : (
-            <ProjectArt
-              type={project.art ?? "auto"}
-              slug={project.slug}
-              category={project.category}
-              language={project.language}
-              topics={project.topics}
-              className="card__svg"
-            />
-          )}
+          <ProjectImage
+            project={project}
+            className={project.image ? undefined : "card__svg"}
+          />
         </div>
         <div className="card__body">
           <div className="card__meta">
@@ -241,18 +233,11 @@ function ProjectRow({ project }: { project: Project }) {
     <div className="row-wrap">
       <a className="row" href={detailUrl(project.slug)} aria-label={`${project.name} — ${project.tagline}`}>
         <div className="row__media">
-          {project.image ? (
-            <img src={project.image} alt="" loading="lazy" decoding="async" />
-          ) : (
-            <ProjectArt
-              type={project.art ?? "auto"}
-              slug={project.slug}
-              category={project.category}
-              language={project.language}
-              topics={project.topics}
-              className="row__svg"
-            />
-          )}
+          <ProjectImage
+            project={project}
+            alt=""
+            className={project.image ? undefined : "row__svg"}
+          />
         </div>
         <div className="row__main">
           <div className="row__top">

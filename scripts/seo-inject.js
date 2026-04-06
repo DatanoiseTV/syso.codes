@@ -24,59 +24,39 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  CATEGORIES,
-  categoriesIndexPage,
-  categoryPage,
-  grouped,
-  homepageItemListJsonLd,
-  homepageNoscript,
-  projectPage,
-  projectsIndexPage,
-  sitemapXml,
-  sorted,
-} from "./lib/page-templates";
-
+import { CATEGORIES, categoriesIndexPage, categoryPage, grouped, homepageItemListJsonLd, homepageNoscript, projectPage, projectsIndexPage, sitemapXml, sorted, } from "./lib/page-templates";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const distRoot = resolve(root, "dist");
 const distHtml = resolve(distRoot, "index.html");
-
 // ─── Inject SPA homepage with JSON-LD + noscript ──────────────────────────
 let html = readFileSync(distHtml, "utf8");
 html = html.replace("<!--SEO_ITEM_LIST-->", homepageItemListJsonLd());
 html = html.replace("<!--SEO_NOSCRIPT-->", homepageNoscript());
 writeFileSync(distHtml, html);
-
 // ─── Write per-project pages ──────────────────────────────────────────────
 let projectCount = 0;
 for (const p of sorted) {
-  const dir = resolve(distRoot, "projects", p.slug);
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(resolve(dir, "index.html"), projectPage(p));
-  projectCount++;
+    const dir = resolve(distRoot, "projects", p.slug);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(resolve(dir, "index.html"), projectPage(p));
+    projectCount++;
 }
-
 // ─── Write per-category pages ─────────────────────────────────────────────
 let categoryCount = 0;
 for (const cat of Object.keys(grouped)) {
-  if (!CATEGORIES[cat]) continue;
-  const dir = resolve(distRoot, "categories", cat);
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(resolve(dir, "index.html"), categoryPage(cat));
-  categoryCount++;
+    if (!CATEGORIES[cat])
+        continue;
+    const dir = resolve(distRoot, "categories", cat);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(resolve(dir, "index.html"), categoryPage(cat));
+    categoryCount++;
 }
-
 // ─── Write index pages ────────────────────────────────────────────────────
 mkdirSync(resolve(distRoot, "categories"), { recursive: true });
 writeFileSync(resolve(distRoot, "categories/index.html"), categoriesIndexPage());
-
 mkdirSync(resolve(distRoot, "projects"), { recursive: true });
 writeFileSync(resolve(distRoot, "projects/index.html"), projectsIndexPage());
-
 // ─── sitemap.xml ───────────────────────────────────────────────────────────
 writeFileSync(resolve(distRoot, "sitemap.xml"), sitemapXml());
-
-console.log(
-  `SEO inject:\n  ${sorted.length} projects in ItemList\n  ${projectCount} per-project pages\n  ${categoryCount} per-category pages\n  2 index pages (projects, categories)\n  + sitemap.xml`
-);
+console.log(`SEO inject:\n  ${sorted.length} projects in ItemList\n  ${projectCount} per-project pages\n  ${categoryCount} per-category pages\n  2 index pages (projects, categories)\n  + sitemap.xml`);

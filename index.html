@@ -9,9 +9,12 @@
     <meta name="format-detection" content="telephone=no" />
 
     <!-- Best practices: CSP, frame-ancestors, permissions -->
+    <!-- img-src is intentionally broad (https:) so GitHub user-attachment URLs
+         that redirect through several signed-URL hosts (objects.githubusercontent.com,
+         private-user-images.githubusercontent.com, etc.) all load. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https://avatars.githubusercontent.com https://*.githubusercontent.com https://github.com; connect-src 'self'; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self'; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="permissions-policy" content="geolocation=(), microphone=(), camera=(), payment=()" />

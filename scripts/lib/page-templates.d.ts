@@ -1,0 +1,20 @@
+import type { Project } from "../../src/types";
+export declare const SITE = "https://syso.codes";
+export declare const CATEGORIES: Record<string, {
+    label: string;
+    description: string;
+}>;
+export declare const sorted: Project[];
+export declare const grouped: Record<string, Project[]>;
+export declare const projectsBySlug: Map<string, Project>;
+export declare const escHtml: (s: string) => string;
+export declare function categoryLabel(c: string): string;
+export declare function projectUrl(p: Project): string;
+export declare function categoryUrl(c: string): string;
+export declare function projectPage(p: Project): string;
+export declare function categoryPage(category: string): string;
+export declare function categoriesIndexPage(): string;
+export declare function projectsIndexPage(): string;
+export declare function homepageItemListJsonLd(): string;
+export declare function homepageNoscript(): string;
+export declare function sitemapXml(): string;

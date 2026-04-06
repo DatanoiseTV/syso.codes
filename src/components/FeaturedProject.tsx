@@ -1,5 +1,5 @@
 import type { Project } from "../types";
-import { ProjectArt } from "./ProjectArt";
+import { ProjectImage } from "./ProjectImage";
 
 interface Props {
   project: Project;
@@ -20,23 +20,10 @@ export function FeaturedProject({ project, hero }: Props) {
         href={detail}
         aria-label={`${project.name} — ${project.tagline}`}
       >
-        {project.image ? (
-          <img
-            src={project.image}
-            alt={`${project.name} screenshot`}
-            loading="lazy"
-            decoding="async"
-          />
-        ) : (
-          <ProjectArt
-            type={project.art ?? "auto"}
-            slug={project.slug}
-            category={project.category}
-            language={project.language}
-            topics={project.topics}
-            className="featured-card__svg"
-          />
-        )}
+        <ProjectImage
+          project={project}
+          className={project.image ? undefined : "featured-card__svg"}
+        />
         <div className="featured-card__media-frame" />
       </a>
       <div className="featured-card__body">
