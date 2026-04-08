@@ -7,7 +7,7 @@ import { CommitActivity } from "./components/CommitActivity";
 import { FeaturedProject } from "./components/FeaturedProject";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { Footer } from "./components/Footer";
-import { BackgroundAnimations } from "./components/BackgroundAnimations";
+import { CanvasBackground } from "./components/CanvasBackground";
 
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
 // `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
@@ -40,7 +40,7 @@ export default function App() {
 
   return (
     <div className="app" id="top">
-      <BackgroundAnimations />
+      <CanvasBackground />
       <Nav />
       <main id="main">
         <Hero publicRepos={GH_PUBLIC_REPOS} totalStars={GH_TOTAL_STARS} />

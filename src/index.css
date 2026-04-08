@@ -104,7 +104,18 @@ body::before {
   z-index: 1;
 }
 
-/* ─── Background animation layer ─────────────────────────────────────────── */
+/* ─── Canvas background layer ────────────────────────────────────────────── */
+.canvas-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  display: block;
+}
+
+/* legacy SVG bg layer (no longer rendered, kept for fallback rules) */
 .bg-anim {
   position: fixed;
   inset: 0;
