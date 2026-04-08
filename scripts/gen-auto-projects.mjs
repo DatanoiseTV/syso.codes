@@ -42,6 +42,7 @@ const skipNames = new Set([
   "NordModularPatches",
   "RaspberryPi-PL011-MIDI",
   "BeMicro-CV-Multicomp",
+  "Gramofon",
 ]);
 
 const filtered = raw.filter((r) => {

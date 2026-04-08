@@ -85,31 +85,6 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    slug: "Gramofon",
-    name: "Gramofon",
-    tagline: "A native macOS player for the indie music web.",
-    description:
-      "A SwiftUI app that unifies Bandcamp, Jamendo, Radio4000, Internet Archive, Discogs, MusicBrainz and ListenBrainz into one player and library — explicitly not a Spotify or Apple Music client. Includes a full multi-band IIR EQ for speaker, headphone and room correction profiles.",
-    story:
-      "Most music apps lock you into a single catalogue. Gramofon connects only to open, independent and community-driven platforms and gives you a single SwiftUI interface to discover, queue, favourite and organise music across all of them, with a SwiftData library, dual-backend playback (AVPlayer + a hidden YouTube WebView for Radio4000) and a tasteful now-playing panel with an animated frequency visualiser. Built in is a full IIR biquad chain so you can load speaker calibration files, headphone EQ presets (AutoEQ-style) or room-correction profiles and have them applied transparently to every backend.",
-    specs: [
-      "SwiftUI + MVVM with @Observable, Swift 5.10, macOS 14+",
-      "Full multi-band IIR biquad EQ — load speaker / headphone / room correction profiles",
-      "Actor-isolated services per platform integration",
-      "Dual playback backend: AVPlayer + WKWebView IFrame",
-      "SwiftData persistence for favourites, playlists, history",
-      "Two-tier cache (memory + disk) with per-source TTL, 200 MB art budget",
-    ],
-    category: "audio-app",
-    language: "Swift",
-    stars: 0,
-    topics: ["macos", "swift", "swiftui", "music", "bandcamp"],
-    url: "https://github.com/DatanoiseTV/Gramofon",
-    image:
-      "https://github.com/user-attachments/assets/cee27eb9-691a-4428-a320-01da0eff4014",
-    featured: true,
-  },
-  {
     slug: "MiniKeys",
     name: "MiniKeys",
     tagline: "Virtual MIDI keyboard + controller builder for macOS.",
