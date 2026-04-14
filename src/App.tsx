@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { projects as curated } from "./data/projects";
 import { autoProjects, pushedDates } from "./data/autoProjects";
-import { HeroScope } from "./components/HeroScope";
+import { KineticHero } from "./components/KineticHero";
+import { MarqueeBand } from "./components/MarqueeBand";
 import { About } from "./components/About";
 import { CommitActivity } from "./components/CommitActivity";
 import { FeaturedProject } from "./components/FeaturedProject";
@@ -44,7 +45,13 @@ export default function App() {
       <AnimatedFavicon />
       <Nav />
       <main id="main">
-        <HeroScope repos={GH_PUBLIC_REPOS} stars={GH_TOTAL_STARS} />
+        <KineticHero repos={GH_PUBLIC_REPOS} stars={GH_TOTAL_STARS} />
+        <MarqueeBand
+          items={allProjects
+            .filter((p) => p.stars > 0 || p.featured)
+            .slice(0, 40)
+            .map((p) => p.name)}
+        />
         <About />
         <CommitActivity />
 
