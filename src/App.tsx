@@ -122,15 +122,15 @@ function BrandMark() {
     >
       <defs>
         <linearGradient id="brand-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#0a0a0d" />
-          <stop offset="1" stopColor="#000000" />
+          <stop offset="0" stopColor="#fbf6e6" />
+          <stop offset="1" stopColor="#efe7cf" />
         </linearGradient>
         <linearGradient id="brand-wave" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#ff6b35" />
-          <stop offset="1" stopColor="#ffa476" />
+          <stop offset="0" stopColor="#1e3a5f" />
+          <stop offset="1" stopColor="#2d4e7a" />
         </linearGradient>
       </defs>
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#brand-bg)" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#brand-bg)" stroke="rgba(20,26,44,0.22)" strokeWidth="1" />
       <path
         d="M 5 16 Q 8 8, 11 16 T 17 16 L 17 11 L 21 11 L 21 21 L 25 21 L 25 16 L 27 16"
         fill="none"
@@ -139,7 +139,7 @@ function BrandMark() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="25" cy="7" r="1.6" fill="#ff8551" />
+      <circle cx="25" cy="7" r="1.6" fill="#1e3a5f" />
     </svg>
   );
 }

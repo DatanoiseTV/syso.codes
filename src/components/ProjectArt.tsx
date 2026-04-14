@@ -61,11 +61,11 @@ export function ProjectArt({ type, slug, category, language, topics, className }
   }
 }
 
-const accent = "#ffffff";
-const accentDim = "rgba(255, 255, 255, 0.35)";
-const amber = "#ff6b35"; // the orange highlight
-const grid = "rgba(255, 255, 255, 0.05)";
-const stroke = "rgba(255, 255, 255, 0.18)";
+const accent = "#1e3a5f";
+const accentDim = "rgba(30, 58, 95, 0.28)";
+const amber = "#9c5a20"; // warm accent secondary
+const grid = "rgba(20, 26, 44, 0.05)";
+const stroke = "rgba(20, 26, 44, 0.18)";
 
 function Frame({
   children,

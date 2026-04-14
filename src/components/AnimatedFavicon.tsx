@@ -53,16 +53,16 @@ export function AnimatedFavicon() {
       // Heartbeat: 0.88 → 1.08 brightness multiplier, slow pulse
       const beat = 0.98 + Math.sin(phase * 0.22) * 0.06;
 
-      // Bold orange gradient background, rounded square filling whole canvas
+      // Warm paper gradient background, rounded square filling whole canvas
       const bg = ctx!.createLinearGradient(0, 0, SIZE, SIZE);
-      bg.addColorStop(0, shade("#ff6b35", beat));
-      bg.addColorStop(1, shade("#ffa476", beat + 0.04));
+      bg.addColorStop(0, shade("#fbf6e6", beat));
+      bg.addColorStop(1, shade("#efe7cf", beat));
       ctx!.fillStyle = bg;
       roundRect(ctx!, 0, 0, SIZE, SIZE, 7);
       ctx!.fill();
 
-      // Inner glow ring on the edge for a touch of depth
-      ctx!.strokeStyle = "rgba(0, 0, 0, 0.28)";
+      // Subtle ink edge
+      ctx!.strokeStyle = "rgba(20, 26, 44, 0.22)";
       ctx!.lineWidth = 1;
       roundRect(ctx!, 0.5, 0.5, SIZE - 1, SIZE - 1, 7);
       ctx!.stroke();
@@ -78,8 +78,8 @@ export function AnimatedFavicon() {
         pts.push([x, y]);
       }
 
-      // Thick black wave
-      ctx!.strokeStyle = "#0a0a0d";
+      // Deep navy wave, ink-on-paper feel
+      ctx!.strokeStyle = "#1e3a5f";
       ctx!.lineWidth = 3.5;
       ctx!.lineCap = "round";
       ctx!.lineJoin = "round";
@@ -90,18 +90,18 @@ export function AnimatedFavicon() {
       });
       ctx!.stroke();
 
-      // White playhead dot travelling along the wave
+      // Paper-toned playhead dot travelling along the wave
       const pt = pts[Math.floor(((phase * 0.03) % 1) * (pts.length - 1))]!;
-      ctx!.shadowColor = "rgba(255, 255, 255, 0.9)";
+      ctx!.shadowColor = "rgba(251, 246, 230, 0.9)";
       ctx!.shadowBlur = 5;
-      ctx!.fillStyle = "#ffffff";
+      ctx!.fillStyle = "#fbf6e6";
       ctx!.beginPath();
       ctx!.arc(pt[0], pt[1], 2.8, 0, Math.PI * 2);
       ctx!.fill();
       ctx!.shadowBlur = 0;
 
-      // Black ring to separate the dot from the wave
-      ctx!.strokeStyle = "#0a0a0d";
+      // Navy ring to separate the dot from the wave
+      ctx!.strokeStyle = "#1e3a5f";
       ctx!.lineWidth = 0.8;
       ctx!.beginPath();
       ctx!.arc(pt[0], pt[1], 2.8, 0, Math.PI * 2);
