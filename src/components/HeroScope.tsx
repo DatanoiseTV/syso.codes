@@ -200,12 +200,17 @@ export function HeroScope({ repos, stars }: Props) {
       <div className="heroscope__content">
         <p className="heroscope__eyebrow">Sylwester · Berlin · DatanoiseTV</p>
         <h1 className="heroscope__title">
-          Audio <em>meets</em> silicon.
+          Software that ships<br />
+          on <em>circuit boards.</em>
         </h1>
-        <p className="heroscope__lede">
-          Hi, I&apos;m <strong>Sylwester</strong>. I write embedded firmware,
-          FPGA gateware, DSP languages, low-latency network audio and native
-          macOS apps. Most of it lives on{" "}
+        <ul className="heroscope__list">
+          <li>Firmware for synthesizers and development boards.</li>
+          <li>FPGA gateware for audio-over-IP.</li>
+          <li>DSP languages, editors and analysers.</li>
+          <li>Native macOS apps for people who make music.</li>
+        </ul>
+        <p className="heroscope__coda">
+          Berlin-based.{" "}
           <a
             href="https://github.com/DatanoiseTV"
             target="_blank"
@@ -214,7 +219,7 @@ export function HeroScope({ repos, stars }: Props) {
           >
             github.com/DatanoiseTV
           </a>
-          , and most of it is open source.
+          . Mostly open source.
         </p>
         <div className="heroscope__cta">
           <a
@@ -223,10 +228,10 @@ export function HeroScope({ repos, stars }: Props) {
             target="_blank"
             rel="noreferrer"
           >
-            github.com/DatanoiseTV →
+            View on GitHub →
           </a>
           <a className="btn btn--ghost" href="#projects">
-            Browse projects
+            Browse the index
           </a>
         </div>
       </div>

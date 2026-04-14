@@ -61,9 +61,9 @@ export default function App() {
               </p>
             </div>
           </div>
-          <div className="featured-list">
+          <div className="feature-list">
             {featured.map((p, i) => (
-              <FeaturedProject key={p.slug} project={p} hero={i === 0} />
+              <FeaturedProject key={p.slug} project={p} index={i} />
             ))}
           </div>
         </section>
