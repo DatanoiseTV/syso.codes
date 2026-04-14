@@ -35,6 +35,29 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    slug: "tinyice-app",
+    name: "TinyIce App",
+    tagline: "Flutter admin client for the TinyIce streaming server.",
+    description:
+      "A Flutter mobile + desktop admin for TinyIce. Real-time dashboard, stream / AutoDJ / relay / transcoder management, WebRTC go-live from the device, history, security (IP bans, lockout clearing), webhooks, and multi-server support — session auth with CSRF.",
+    specs: [
+      "Real-time dashboard: listeners, streams, AutoDJs",
+      "Full CRUD for streams, AutoDJs, relays, transcoders, webhooks",
+      "AutoDJ transport: play / pause / next / shuffle / loop / scan / save",
+      "WebRTC go-live — broadcast from phone or desktop",
+      "Security: IP ban / whitelist, lockout clearing, session + CSRF auth",
+      "iOS · Android · macOS · multi-server",
+    ],
+    category: "audio-app",
+    language: "Dart",
+    stars: 0,
+    topics: ["flutter", "tinyice", "streaming", "admin", "webrtc"],
+    url: "https://github.com/DatanoiseTV/tinyice-app",
+    image:
+      "https://github.com/user-attachments/assets/0cd66634-c237-435f-9333-43fbcd540a60",
+    featured: true,
+  },
+  {
     slug: "dsplab",
     name: "DSPLab",
     tagline: "An AI-assisted lab for audio DSP.",
@@ -229,6 +252,31 @@ export const projects: Project[] = [
     url: "https://github.com/DatanoiseTV/spice-oss",
     image:
       "https://github.com/user-attachments/assets/df9af651-8074-40f8-a06e-bec7d7bbf3e9",
+    featured: true,
+  },
+  {
+    slug: "jtag-idf-component",
+    name: "ESP-IDF JTAG",
+    tagline: "A general-purpose JTAG programmer on an ESP32.",
+    description:
+      "An ESP-IDF v6.0 component that turns any ESP32 into a standalone JTAG programmer with a browser UI — scan chains, program FPGAs, flash XMOS xCORE, play SVF files. Two backends: GPIO bit-bang on any ESP32 (1–5 MHz) or PARLIO + DMA on the ESP32-P4 (up to 40 MHz).",
+    story:
+      "Built for the moment you need to flash a JTAG device on a production line or at a remote bring-up without a PC. The component detects every device on the chain (XMOS, Lattice, Xilinx, Espressif, ARM DAPs) by IDCODE, renders the chain diagram in a browser, and handles full xCORE programming — loading .xe firmware into RAM, programming SPI flash via a JTAG-loaded stub, and per-tile debug register access. Boundary scan support auto-detects BSR length and live-refreshes pin states from the UI.",
+    specs: [
+      "Two backends: GPIO bit-bang (1–5 MHz) or PARLIO + DMA (up to 40 MHz) on ESP32-P4",
+      "Chain auto-detection by IDCODE — XMOS xCORE.ai / XS2 / XS1, Lattice ECP5 & iCE40, Xilinx 7-series, ARM CoreSight DAPs, Espressif SoCs",
+      "Full XMOS programming: .xe parser, RAM boot, SPI flash via JTAG stub, PSWITCH/SSWITCH debug",
+      "Boundary-scan with auto BSR length detection and live pin-state refresh",
+      "Browser UI with chain diagram, firmware inspector, one-click flash — no tools to install",
+      "1.8 V target support via level shifter; ESP32-P4-NANO's LDO_VO4 supplies the low-voltage rail",
+    ],
+    category: "embedded",
+    language: "C",
+    stars: 0,
+    topics: ["esp32", "esp32-p4", "jtag", "xmos", "fpga", "programmer"],
+    url: "https://github.com/DatanoiseTV/jtag-idf-component",
+    image:
+      "https://github.com/user-attachments/assets/7fd63ede-c594-4aef-853a-fe4208c1809c",
     featured: true,
   },
 
@@ -504,6 +552,25 @@ export const projects: Project[] = [
     url: "https://github.com/DatanoiseTV/colorlight-i9-aes67",
     art: "fpga",
   },
+  {
+    slug: "ad732x-adc-idf-component",
+    name: "AD732x ADC Driver",
+    tagline: "DMA-backed SPI driver for the 500 kSPS true-bipolar AD732x ADC.",
+    description:
+      "An ESP-IDF component for the Analog Devices AD732x — a 500 kSPS, 8-channel, software-selectable true-bipolar 12-bit + sign SAR ADC. DMA-backed SPI transfers so the CPU stays out of the sample stream.",
+    specs: [
+      "8 channels, software-selectable true-bipolar input ranges",
+      "12-bit + sign resolution, 500 kSPS sustained",
+      "DMA-backed SPI for zero-CPU streaming",
+      "Per-channel range / mode configuration",
+    ],
+    category: "embedded",
+    language: "C",
+    stars: 0,
+    topics: ["esp32", "adc", "ad7327", "spi", "dma", "driver"],
+    url: "https://github.com/DatanoiseTV/ad732x-adc-idf-component",
+    art: "chip",
+  },
 
   // ─── Linux audio ─────────────────────────────────────────────────────────
   {
@@ -645,6 +712,29 @@ export const projects: Project[] = [
     topics: ["wavetable", "synthesizer", "dsp", "audio", "teensy"],
     url: "https://github.com/DatanoiseTV/AKWF_WaveForms",
     art: "wavetable",
+  },
+  {
+    slug: "nginx-fancy-index-hook",
+    name: "Fancy Index",
+    tagline: "A drop-in dark-themed directory listing for nginx autoindex.",
+    description:
+      "Pure HTML/CSS/JS injected via ngx_http_addition_module — no server-side scripts. Turns nginx's bare autoindex into a dark-themed file browser with badges, inline previews (Markdown, syntax-highlighted code, hex, PE/EFI headers), an audio player with ID3, image gallery, zip download, git-repo awareness and keyboard navigation.",
+    specs: [
+      "Single drop-in template pair — no PHP / node / anything server-side",
+      "File-type badges (EFI, iPXE, kPXE, LKRN, image, audio, …)",
+      "Audio player with ID3 (title, artist, album, artwork) reading ≤256 KB",
+      "Image gallery w/ prev/next, zoom, auto-gallery on image-only folders",
+      "Inline preview: Markdown, highlight.js (40+ languages), hex, PE/EFI headers",
+      ".git/HEAD + log parser — recognises repos and shows last 5 commits",
+      "Multi-select ZIP download via JSZip · keyboard nav (↑ ↓ Space Esc ← →)",
+    ],
+    category: "dev-tools",
+    language: "JavaScript",
+    stars: 0,
+    topics: ["nginx", "autoindex", "directory-listing", "file-browser", "dark-theme"],
+    url: "https://github.com/DatanoiseTV/nginx-fancy-index-hook",
+    image:
+      "https://github.com/user-attachments/assets/438c614f-24b0-459a-abc0-c1824c35764e",
   },
   {
     slug: "TurboMidi",
