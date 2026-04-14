@@ -14,52 +14,13 @@ export interface CommitWeek {
 
 export const commitActivity = {
   user: "DatanoiseTV",
-  total: 294,
-  max: 19,
-  activeDays: 91,
-  currentStreak: 8,
+  total: 320,
+  max: 20,
+  activeDays: 93,
+  currentStreak: 5,
   longestStreak: 11,
-  fetchedAt: "2026-04-06T13:38:42.508Z",
+  fetchedAt: "2026-04-14T21:11:20.260Z",
   weeks: [
-  {
-    "days": [
-      {
-        "date": "2025-04-06",
-        "count": 0,
-        "weekday": 0
-      },
-      {
-        "date": "2025-04-07",
-        "count": 0,
-        "weekday": 1
-      },
-      {
-        "date": "2025-04-08",
-        "count": 0,
-        "weekday": 2
-      },
-      {
-        "date": "2025-04-09",
-        "count": 0,
-        "weekday": 3
-      },
-      {
-        "date": "2025-04-10",
-        "count": 0,
-        "weekday": 4
-      },
-      {
-        "date": "2025-04-11",
-        "count": 0,
-        "weekday": 5
-      },
-      {
-        "date": "2025-04-12",
-        "count": 0,
-        "weekday": 6
-      }
-    ]
-  },
   {
     "days": [
       {
@@ -381,12 +342,12 @@ export const commitActivity = {
       },
       {
         "date": "2025-06-09",
-        "count": 4,
+        "count": 3,
         "weekday": 1
       },
       {
         "date": "2025-06-10",
-        "count": 1,
+        "count": 0,
         "weekday": 2
       },
       {
@@ -401,12 +362,12 @@ export const commitActivity = {
       },
       {
         "date": "2025-06-13",
-        "count": 1,
+        "count": 0,
         "weekday": 5
       },
       {
         "date": "2025-06-14",
-        "count": 3,
+        "count": 1,
         "weekday": 6
       }
     ]
@@ -425,7 +386,7 @@ export const commitActivity = {
       },
       {
         "date": "2025-06-17",
-        "count": 4,
+        "count": 2,
         "weekday": 2
       },
       {
@@ -435,17 +396,17 @@ export const commitActivity = {
       },
       {
         "date": "2025-06-19",
-        "count": 2,
+        "count": 0,
         "weekday": 4
       },
       {
         "date": "2025-06-20",
-        "count": 1,
+        "count": 0,
         "weekday": 5
       },
       {
         "date": "2025-06-21",
-        "count": 2,
+        "count": 1,
         "weekday": 6
       }
     ]
@@ -2058,8 +2019,52 @@ export const commitActivity = {
       },
       {
         "date": "2026-04-06",
-        "count": 9,
+        "count": 20,
         "weekday": 1
+      },
+      {
+        "date": "2026-04-07",
+        "count": 0,
+        "weekday": 2
+      },
+      {
+        "date": "2026-04-08",
+        "count": 4,
+        "weekday": 3
+      },
+      {
+        "date": "2026-04-09",
+        "count": 0,
+        "weekday": 4
+      },
+      {
+        "date": "2026-04-10",
+        "count": 8,
+        "weekday": 5
+      },
+      {
+        "date": "2026-04-11",
+        "count": 1,
+        "weekday": 6
+      }
+    ]
+  },
+  {
+    "days": [
+      {
+        "date": "2026-04-12",
+        "count": 4,
+        "weekday": 0
+      },
+      {
+        "date": "2026-04-13",
+        "count": 6,
+        "weekday": 1
+      },
+      {
+        "date": "2026-04-14",
+        "count": 3,
+        "weekday": 2
       }
     ]
   }

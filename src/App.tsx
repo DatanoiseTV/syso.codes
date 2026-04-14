@@ -13,8 +13,8 @@ import { ScrollProgress } from "./components/ScrollProgress";
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
 // `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
 // `gh api users/DatanoiseTV` directly.
-const GH_PUBLIC_REPOS = 245;
-const GH_TOTAL_STARS = 1077;
+const GH_PUBLIC_REPOS = 252;
+const GH_TOTAL_STARS = 1079;
 
 export default function App() {
   const allProjects = useMemo(() => {
