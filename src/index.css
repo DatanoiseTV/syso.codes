@@ -908,10 +908,10 @@ body::before {
 .activity__chart {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-template-rows: auto 1fr auto;
-  gap: 8px 12px;
-  padding: 28px 32px;
+  gap: 10px 14px;
+  padding: 28px 32px 24px;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: rgba(13, 13, 13, 0.4);
@@ -920,9 +920,44 @@ body::before {
   overflow: hidden;
 }
 
+/* Play button pinned top-right of the chart */
+.activity__play {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 11px;
+  border-radius: 999px;
+  background: rgba(18, 18, 18, 0.7);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.activity__play:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+  background: rgba(255, 107, 53, 0.06);
+}
+.activity__play svg {
+  color: var(--accent);
+}
+
+/* the months row now spans only the middle grid column */
 .activity__months {
   grid-column: 2;
   grid-row: 1;
+}
+
+.activity__months {
   position: relative;
   height: 16px;
   font-size: 11px;
@@ -1057,13 +1092,67 @@ body::before {
   box-shadow: 0 0 12px rgba(255, 107, 53, 0.35);
 }
 
+/* hot (L4) cells get a subtle ambient pulse */
+.activity__cell--hot {
+  animation: activity-hot-pulse 3s var(--ease-in-out) infinite;
+  animation-delay: calc(var(--i) * 17ms);
+}
+@keyframes activity-hot-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 107, 53, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.7),
+      0 0 4px rgba(255, 164, 118, 0.8);
+  }
+}
+
+/* today's cell — a subtle white ring to anchor "now" in the chart */
+.activity__cell--today {
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.85),
+    0 0 12px rgba(255, 255, 255, 0.25);
+  z-index: 2;
+}
+.activity__cell--today.activity__cell--hot {
+  animation: none;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.85),
+    0 0 18px rgba(255, 107, 53, 0.6);
+}
+
+/* playback reveal: cells in the future (relative to playhead) are hidden */
+.activity__chart--playing .activity__cell--hidden {
+  opacity: 0;
+  transform: scale(0.4);
+}
+/* the current playhead cell flashes bright */
+.activity__cell--playhead {
+  animation: activity-playhead 300ms var(--ease-out);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 24px var(--accent-glow);
+  z-index: 3;
+}
+@keyframes activity-playhead {
+  0% {
+    transform: scale(2);
+    box-shadow: 0 0 0 3px var(--accent-bright), 0 0 32px var(--accent-glow);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px var(--accent), 0 0 24px var(--accent-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity__cell--hot {
+    animation: none;
+  }
+}
+
 /* legend */
 .activity__legend {
   grid-column: 2;
   grid-row: 3;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 6px;
   margin-top: 8px;
   font-family: var(--font-mono);
@@ -1081,6 +1170,102 @@ body::before {
   width: 11px;
   height: 11px;
   border-radius: 2px;
+}
+
+/* weekday micro chart, bottom-right of the chart card */
+.activity__weekday {
+  grid-column: 3;
+  grid-row: 2 / span 2;
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 108px;
+  padding: 10px 0 0;
+}
+.activity__weekday-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.activity__weekday-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  align-items: end;
+  height: 56px;
+}
+.activity__weekday-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+.activity__weekday-bar {
+  width: 100%;
+  min-height: 2px;
+  background: linear-gradient(180deg, rgba(255, 107, 53, 0.55), rgba(255, 107, 53, 0.22));
+  border-radius: 2px;
+  align-self: end;
+  transition: height var(--dur-slow) var(--ease-out);
+}
+.activity__weekday-bar--peak {
+  background: linear-gradient(180deg, #ff6b35, #ffa476);
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.45);
+}
+.activity__weekday-tick {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 980px) {
+  .activity__chart {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 8px 12px;
+  }
+  .activity__play {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .activity__months {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .activity__days {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .activity__grid {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  .activity__legend {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    justify-content: flex-start;
+  }
+  .activity__weekday {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    justify-self: stretch;
+    width: 100%;
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .activity__weekday-bars {
+    height: 42px;
+  }
 }
 
 /* hover tooltip */
