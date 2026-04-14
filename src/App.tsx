@@ -1,18 +1,14 @@
 import { useMemo } from "react";
 import { projects as curated } from "./data/projects";
 import { autoProjects, pushedDates } from "./data/autoProjects";
-import { KineticHero } from "./components/KineticHero";
-import { MarqueeBand } from "./components/MarqueeBand";
-import { About } from "./components/About";
-import { CommitActivity } from "./components/CommitActivity";
-import { FeaturedProject } from "./components/FeaturedProject";
-import { ProjectGrid } from "./components/ProjectGrid";
-import { Footer } from "./components/Footer";
-import { AnimatedFavicon } from "./components/AnimatedFavicon";
+import { Intro } from "./sections/Intro";
+import { Work } from "./sections/Work";
+import { Activity } from "./sections/Activity";
+import { ProjectsIndex } from "./sections/Index";
+import { Footer } from "./sections/Footer";
 
-// Live counts from `gh api users/DatanoiseTV` — refresh by re-running
-// `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
-// `gh api users/DatanoiseTV` directly.
+// Keep these in sync with `gh api users/DatanoiseTV` (the auto-generator
+// script prints the latest counts — copy them here on refresh).
 const GH_PUBLIC_REPOS = 252;
 const GH_TOTAL_STARS = 1079;
 
@@ -38,46 +34,17 @@ export default function App() {
   );
 
   return (
-    <div className="app" id="top">
-      <a className="skip-link" href="#main">
+    <div className="app">
+      <a className="skip" href="#main">
         Skip to content
       </a>
-      <AnimatedFavicon />
       <Nav />
       <main id="main">
-        <KineticHero repos={GH_PUBLIC_REPOS} stars={GH_TOTAL_STARS} />
-        <MarqueeBand
-          items={allProjects
-            .filter((p) => p.stars > 0 || p.featured)
-            .slice(0, 40)
-            .map((p) => p.name)}
-        />
-        <About />
-        <CommitActivity />
-
-        <section id="featured" className="featured-section" aria-labelledby="featured-title">
-          <div className="section-head">
-            <div>
-              <p className="section-eyebrow">Highlights</p>
-              <h2 className="section-title" id="featured-title">Projects worth a closer look.</h2>
-              <p className="section-blurb">
-                A handful of recent builds — audio servers, native macOS tools,
-                an AI-assisted DSP lab, hardware development boards, an analog-modeled
-                VST plugin, and embedded systems where the firmware does most of
-                the talking.
-              </p>
-            </div>
-          </div>
-          <div className="feature-list">
-            {featured.map((p, i) => (
-              <FeaturedProject key={p.slug} project={p} index={i} />
-            ))}
-          </div>
-        </section>
-
-        <ProjectGrid projects={allProjects} />
+        <Intro repos={GH_PUBLIC_REPOS} stars={GH_TOTAL_STARS} />
+        <Work projects={featured} />
+        <Activity />
+        <ProjectsIndex projects={allProjects} />
       </main>
-
       <Footer />
     </div>
   );
@@ -85,61 +52,32 @@ export default function App() {
 
 function Nav() {
   return (
-    <nav className="nav" aria-label="Main navigation">
-      <a className="nav__brand" href="#top" aria-label="syso.codes home">
-        <BrandMark />
-        syso<span className="nav__brand-dot">.</span>codes
-      </a>
-      <ul className="nav__links" role="list">
-        <li><a href="#about">About</a></li>
-        <li><a href="#activity">Activity</a></li>
-        <li><a href="#featured">Featured</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li>
-          <a
-            href="https://github.com/DatanoiseTV"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="DatanoiseTV on GitHub (opens in new tab)"
-          >
-            GitHub →
-          </a>
-        </li>
-      </ul>
+    <nav className="nav" aria-label="Primary">
+      <div className="nav__inner">
+        <a className="nav__brand" href="#top">
+          syso<span>.</span>codes
+        </a>
+        <ul className="nav__links" role="list">
+          <li>
+            <a href="#work">Work</a>
+          </li>
+          <li>
+            <a href="#activity">Activity</a>
+          </li>
+          <li>
+            <a href="#index">Index</a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/DatanoiseTV"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub ↗
+            </a>
+          </li>
+        </ul>
+      </div>
     </nav>
-  );
-}
-
-function BrandMark() {
-  return (
-    <svg
-      className="nav__brand-mark"
-      viewBox="0 0 32 32"
-      width="30"
-      height="30"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="brand-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fbf6e6" />
-          <stop offset="1" stopColor="#efe7cf" />
-        </linearGradient>
-        <linearGradient id="brand-wave" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#1e3a5f" />
-          <stop offset="1" stopColor="#2d4e7a" />
-        </linearGradient>
-      </defs>
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#brand-bg)" stroke="rgba(20,26,44,0.22)" strokeWidth="1" />
-      <path
-        d="M 5 16 Q 8 8, 11 16 T 17 16 L 17 11 L 21 11 L 21 21 L 25 21 L 25 16 L 27 16"
-        fill="none"
-        stroke="url(#brand-wave)"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="25" cy="7" r="1.6" fill="#1e3a5f" />
-    </svg>
   );
 }
