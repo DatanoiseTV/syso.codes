@@ -1,13 +1,12 @@
 import { useMemo } from "react";
 import { projects as curated } from "./data/projects";
 import { autoProjects, pushedDates } from "./data/autoProjects";
-import { Hero } from "./components/Hero";
+import { HeroScope } from "./components/HeroScope";
 import { About } from "./components/About";
 import { CommitActivity } from "./components/CommitActivity";
 import { FeaturedProject } from "./components/FeaturedProject";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { Footer } from "./components/Footer";
-import { CanvasBackground } from "./components/CanvasBackground";
 import { AnimatedFavicon } from "./components/AnimatedFavicon";
 
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
@@ -43,10 +42,9 @@ export default function App() {
         Skip to content
       </a>
       <AnimatedFavicon />
-      <CanvasBackground />
       <Nav />
       <main id="main">
-        <Hero publicRepos={GH_PUBLIC_REPOS} totalStars={GH_TOTAL_STARS} />
+        <HeroScope repos={GH_PUBLIC_REPOS} stars={GH_TOTAL_STARS} />
         <About />
         <CommitActivity />
 
