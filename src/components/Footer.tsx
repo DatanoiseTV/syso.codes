@@ -1,3 +1,5 @@
+const BUILD_STAMP = new Date().toISOString().slice(0, 10);
+
 export function Footer() {
   return (
     <footer className="footer">
@@ -33,6 +35,23 @@ export function Footer() {
           licence — read the LICENSE file in the relevant repository before
           redistributing or modifying.
         </p>
+      </div>
+
+      <div className="footer__techline">
+        <span className="footer__prompt">$</span>
+        <span>
+          built with{" "}
+          <span className="footer__stack">Vite</span>
+          {" + "}
+          <span className="footer__stack">React 18</span>
+          {" + "}
+          <span className="footer__stack">TypeScript</span>
+          {" · canvas + css · shipped via "}
+          <span className="footer__stack">GitHub Actions</span>
+        </span>
+        <span className="footer__build" title="Build stamp">
+          build {BUILD_STAMP}
+        </span>
       </div>
 
       <div className="footer__bottom">

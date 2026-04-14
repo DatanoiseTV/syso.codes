@@ -8,6 +8,7 @@ import { FeaturedProject } from "./components/FeaturedProject";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { Footer } from "./components/Footer";
 import { CanvasBackground } from "./components/CanvasBackground";
+import { ScrollProgress } from "./components/ScrollProgress";
 
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
 // `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
@@ -40,6 +41,10 @@ export default function App() {
 
   return (
     <div className="app" id="top">
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <ScrollProgress />
       <CanvasBackground />
       <Nav />
       <main id="main">
@@ -50,7 +55,9 @@ export default function App() {
         <section id="featured" className="featured-section" aria-labelledby="featured-title">
           <div className="section-head">
             <div>
-              <p className="section-eyebrow">Highlights</p>
+              <p className="section-eyebrow">
+                <span className="section-num">03</span>Highlights
+              </p>
               <h2 className="section-title" id="featured-title">Projects worth a closer look.</h2>
               <p className="section-blurb">
                 A handful of recent builds — audio servers, native macOS tools,
@@ -78,10 +85,20 @@ export default function App() {
 function Nav() {
   return (
     <nav className="nav" aria-label="Main navigation">
-      <a className="nav__brand" href="#top" aria-label="syso.codes home">
-        <BrandMark />
-        syso<span className="nav__brand-dot">.</span>codes
-      </a>
+      <div className="nav__brand-row">
+        <a className="nav__brand" href="#top" aria-label="syso.codes home">
+          <BrandMark />
+          syso<span className="nav__brand-dot">.</span>codes
+        </a>
+        <span
+          className="nav__status"
+          title="Available for interesting projects"
+          aria-label="Status: available for interesting projects"
+        >
+          <span className="nav__status-dot" aria-hidden="true" />
+          Available
+        </span>
+      </div>
       <ul className="nav__links" role="list">
         <li><a href="#about">About</a></li>
         <li><a href="#activity">Activity</a></li>

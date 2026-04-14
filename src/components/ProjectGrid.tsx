@@ -79,7 +79,9 @@ export function ProjectGrid({ projects }: Props) {
     <section id="projects" className="grid-section">
       <div className="section-head">
         <div>
-          <p className="section-eyebrow">All projects</p>
+          <p className="section-eyebrow">
+            <span className="section-num">04</span>All projects
+          </p>
           <h2 className="section-title">The full lab.</h2>
           <p className="section-blurb">
             {projects.length} open-source projects across embedded, audio-over-IP,

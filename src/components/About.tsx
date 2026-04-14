@@ -34,7 +34,9 @@ export function About() {
             <div className="about__avatar-tag">Sylwester · Berlin</div>
           </div>
           <div className="about__main">
-            <p className="section-eyebrow">About</p>
+            <p className="section-eyebrow">
+              <span className="section-num">01</span>About
+            </p>
             <h2 className="section-title">
               Hardware, music, and code —<br />
               <span className="about__title-accent">always.</span>

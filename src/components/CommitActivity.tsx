@@ -79,7 +79,9 @@ export function CommitActivity() {
       <div className="activity__inner">
         <div className="activity__head">
           <div>
-            <p className="section-eyebrow">Activity</p>
+            <p className="section-eyebrow">
+              <span className="section-num">02</span>Activity
+            </p>
             <h2 className="section-title">
               <span className="activity__count">{commitActivity.total.toLocaleString()}</span>{" "}
               contributions in the last year.
