@@ -18,8 +18,6 @@ const MONTHS = [
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// Flatten day data once, with its chronological index so playback can
-// reveal cells in real order even though the grid is laid out by week.
 interface FlatDay {
   date: string;
   count: number;
@@ -27,6 +25,14 @@ interface FlatDay {
   weekIndex: number;
   chronoIndex: number;
 }
+
+// ease-in-out cubic — gentle acceleration, slow landing
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+const PLAYBACK_MS = 10_000; // total playback duration
+const TRAIL_LEN = 8; // how many cells behind the playhead glow
 
 export function CommitActivity() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -38,8 +44,6 @@ export function CommitActivity() {
     y: number;
   } | null>(null);
 
-  // playback: when playing, playhead advances day-by-day; cells beyond
-  // the playhead are hidden, the current playhead cell is emphasised.
   const [playing, setPlaying] = useState(false);
   const [playhead, setPlayhead] = useState<number | null>(null);
 
@@ -77,14 +81,20 @@ export function CommitActivity() {
     return out;
   }, []);
 
-  // map date → chronoIndex so we can find today fast
+  // running total array so the playback counter is O(1) per frame
+  const runningTotals = useMemo(() => {
+    let sum = 0;
+    return flatDays.map((d) => (sum += d.count));
+  }, [flatDays]);
+
+  // today lookup
   const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const todayIndex = useMemo(
     () => flatDays.findIndex((d) => d.date === todayIso),
     [flatDays, todayIso]
   );
 
-  // weekday totals for the mini bar chart (0=Sun … 6=Sat)
+  // weekday totals
   const weekdayTotals = useMemo(() => {
     const totals = [0, 0, 0, 0, 0, 0, 0];
     for (const d of flatDays) totals[d.weekday] += d.count;
@@ -99,7 +109,16 @@ export function CommitActivity() {
     [weekdayTotals]
   );
 
-  // bucket counts into 0..4 levels relative to the busiest day
+  // peak day (single best day of the year)
+  const peakDay = useMemo(() => {
+    let best: FlatDay | null = null;
+    for (const d of flatDays) {
+      if (!best || d.count > best.count) best = d;
+    }
+    return best;
+  }, [flatDays]);
+
+  // bucket counts into 0..4 levels
   const levelFor = useMemo(() => {
     const max = commitActivity.max;
     return (count: number): number => {
@@ -113,29 +132,38 @@ export function CommitActivity() {
     };
   }, []);
 
-  // playback loop
+  // eased rAF-driven playback
   useEffect(() => {
     if (!playing) return;
-    let idx = 0;
-    setPlayhead(0);
-    const totalDays = flatDays.length;
-    // ~2.4s total: 371 days / ~150 fps feel → 8ms/day, but only apply
-    // once per animation frame so the browser never stalls.
-    const MS_PER_DAY = Math.max(4, Math.floor(2400 / totalDays));
-    const id = window.setInterval(() => {
-      idx += 1;
-      if (idx >= totalDays) {
-        setPlayhead(null);
-        setPlaying(false);
-        window.clearInterval(id);
-        return;
-      }
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setPlaying(false);
+      return;
+    }
+    const total = flatDays.length;
+    const startTime = performance.now();
+    let rafId = 0;
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / PLAYBACK_MS);
+      const eased = easeInOutCubic(t);
+      const idx = Math.min(total - 1, Math.floor(eased * total));
       setPlayhead(idx);
-    }, MS_PER_DAY);
-    return () => window.clearInterval(id);
+      if (t < 1) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        // settle: hold for ~450ms then clear
+        window.setTimeout(() => {
+          setPlayhead(null);
+          setPlaying(false);
+        }, 450);
+      }
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [playing, flatDays.length]);
 
-  // month labels (first week in each month)
+  // month labels
   const monthLabels = useMemo(() => {
     const labels: { month: string; weekIndex: number }[] = [];
     let lastMonth = -1;
@@ -151,6 +179,30 @@ export function CommitActivity() {
     return labels;
   }, []);
 
+  // playback info: current month + running total (null when not playing)
+  const playInfo = useMemo(() => {
+    if (playhead == null) return null;
+    const day = flatDays[playhead];
+    if (!day) return null;
+    const d = new Date(day.date);
+    return {
+      monthName: `${MONTHS[d.getMonth()]} ${d.getFullYear()}`,
+      runningTotal: runningTotals[playhead] ?? 0,
+      dateLabel: d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+    };
+  }, [playhead, flatDays, runningTotals]);
+
+  const chartClassName = [
+    "activity__chart",
+    revealed ? "activity__chart--revealed" : "",
+    playing || playhead != null ? "activity__chart--playing" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <section id="activity" className="activity">
       <div className="activity__inner">
@@ -159,14 +211,35 @@ export function CommitActivity() {
             <p className="section-eyebrow">
               <span className="section-num">02</span>Activity
             </p>
-            <h2 className="section-title">
-              <span className="activity__count">{commitActivity.total.toLocaleString()}</span>{" "}
-              contributions in the last year.
+            <h2 className="section-title activity__title">
+              {playInfo ? (
+                <span className="activity__playback-title">
+                  <span className="activity__playback-month">
+                    {playInfo.monthName}
+                  </span>
+                  <span className="activity__playback-counter">
+                    <span className="activity__count">
+                      {playInfo.runningTotal.toLocaleString()}
+                    </span>
+                    <span className="activity__playback-total">
+                      {" "}/ {commitActivity.total.toLocaleString()}
+                    </span>
+                  </span>
+                </span>
+              ) : (
+                <>
+                  <span className="activity__count">
+                    {commitActivity.total.toLocaleString()}
+                  </span>{" "}
+                  contributions in the last year.
+                </>
+              )}
             </h2>
             <p className="section-blurb">
               Pulled live from the GitHub GraphQL API at build time.
-              Each square is one day, and the colour scales with the number
-              of commits, PRs and reviews that day.
+              Hit <strong>replay</strong> to watch the year play back —
+              each square is one day, colour scales with commits / PRs /
+              reviews that day.
             </p>
           </div>
 
@@ -180,10 +253,9 @@ export function CommitActivity() {
 
         <div
           ref={ref}
-          className={`activity__chart${revealed ? " activity__chart--revealed" : ""}${playing || playhead != null ? " activity__chart--playing" : ""}`}
+          className={chartClassName}
           onMouseLeave={() => setHovered(null)}
         >
-          {/* Month labels along the top */}
           <div className="activity__months" aria-hidden="true">
             {monthLabels.map((m) => (
               <span
@@ -196,12 +268,11 @@ export function CommitActivity() {
             ))}
           </div>
 
-          {/* Playback control */}
           <button
             type="button"
-            className="activity__play"
+            className={`activity__play${playing ? " activity__play--active" : ""}`}
             onClick={() => setPlaying((v) => !v)}
-            aria-label={playing ? "Stop time-lapse" : "Play time-lapse of the year"}
+            aria-label={playing ? "Stop time-lapse" : "Replay the year time-lapse"}
           >
             {playing ? (
               <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
@@ -216,14 +287,12 @@ export function CommitActivity() {
             <span>{playing ? "Stop" : "Replay the year"}</span>
           </button>
 
-          {/* Day labels (Mon / Wed / Fri) along the left */}
           <div className="activity__days" aria-hidden="true">
             <span style={{ gridRow: 2 }}>Mon</span>
             <span style={{ gridRow: 4 }}>Wed</span>
             <span style={{ gridRow: 6 }}>Fri</span>
           </div>
 
-          {/* The actual grid */}
           <div
             className="activity__grid"
             role="img"
@@ -233,6 +302,11 @@ export function CommitActivity() {
               const level = levelFor(d.count);
               const isToday = d.chronoIndex === todayIndex;
               const isPlayhead = playhead === d.chronoIndex;
+              const trailK =
+                playhead != null && d.chronoIndex < playhead
+                  ? playhead - d.chronoIndex
+                  : -1;
+              const inTrail = trailK > 0 && trailK <= TRAIL_LEN;
               const hiddenByPlayback = playhead != null && d.chronoIndex > playhead;
               return (
                 <div
@@ -243,6 +317,7 @@ export function CommitActivity() {
                     level === 4 ? "activity__cell--hot" : "",
                     isToday ? "activity__cell--today" : "",
                     isPlayhead ? "activity__cell--playhead" : "",
+                    inTrail ? "activity__cell--trail" : "",
                     hiddenByPlayback ? "activity__cell--hidden" : "",
                   ]
                     .filter(Boolean)
@@ -252,11 +327,14 @@ export function CommitActivity() {
                       gridColumn: d.weekIndex + 1,
                       gridRow: d.weekday + 1,
                       "--i": d.chronoIndex,
+                      "--trail-k": inTrail ? trailK : 0,
                     } as React.CSSProperties
                   }
                   onMouseEnter={(e) => {
                     const rect = (e.target as HTMLElement).getBoundingClientRect();
-                    const parent = (e.currentTarget.closest(".activity__chart") as HTMLElement)?.getBoundingClientRect();
+                    const parent = (
+                      e.currentTarget.closest(".activity__chart") as HTMLElement
+                    )?.getBoundingClientRect();
                     if (!parent) return;
                     setHovered({
                       date: d.date,
@@ -270,7 +348,6 @@ export function CommitActivity() {
             })}
           </div>
 
-          {/* Legend */}
           <div className="activity__legend" aria-hidden="true">
             <span className="activity__legend-label">Less</span>
             <div className="activity__legend-cell activity__cell--l0" />
@@ -281,7 +358,6 @@ export function CommitActivity() {
             <span className="activity__legend-label">More</span>
           </div>
 
-          {/* Weekday summary */}
           <div
             className="activity__weekday"
             role="img"
@@ -304,14 +380,10 @@ export function CommitActivity() {
             </div>
           </div>
 
-          {/* Hover tooltip */}
           {hovered && (
             <div
               className="activity__tooltip"
-              style={{
-                left: `${hovered.x}px`,
-                top: `${hovered.y}px`,
-              }}
+              style={{ left: `${hovered.x}px`, top: `${hovered.y}px` }}
             >
               <strong>{hovered.count}</strong>{" "}
               {hovered.count === 1 ? "contribution" : "contributions"}
@@ -320,6 +392,45 @@ export function CommitActivity() {
               </span>
             </div>
           )}
+        </div>
+
+        {/* Insights strip */}
+        <div className="activity__insights" role="list">
+          <Insight
+            label="Peak day"
+            value={
+              peakDay
+                ? new Date(peakDay.date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "—"
+            }
+            detail={
+              peakDay
+                ? `${peakDay.count} ${peakDay.count === 1 ? "commit" : "commits"}`
+                : ""
+            }
+          />
+          <Insight
+            label="Busiest weekday"
+            value={WEEKDAYS[busiestWeekday] ?? "—"}
+            detail={`${weekdayTotals[busiestWeekday]!.toLocaleString()} total`}
+          />
+          <Insight
+            label="Avg / active day"
+            value={
+              commitActivity.activeDays > 0
+                ? (commitActivity.total / commitActivity.activeDays).toFixed(1)
+                : "—"
+            }
+            detail="commits"
+          />
+          <Insight
+            label="Last update"
+            value={commitActivity.fetchedAt.slice(0, 10)}
+            detail="fetched at build time"
+          />
         </div>
       </div>
     </section>
@@ -331,6 +442,24 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="activity-stat">
       <div className="activity-stat__value">{value}</div>
       <div className="activity-stat__label">{label}</div>
+    </div>
+  );
+}
+
+function Insight({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+}) {
+  return (
+    <div className="insight" role="listitem">
+      <span className="insight__label">{label}</span>
+      <span className="insight__value">{value}</span>
+      {detail && <span className="insight__detail">{detail}</span>}
     </div>
   );
 }
