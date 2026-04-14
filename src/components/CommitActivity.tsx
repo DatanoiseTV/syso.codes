@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { commitActivity } from "../data/commitActivity";
+import { useCountUp } from "../hooks/useCountUp";
 
 const MONTHS = [
   "Jan",
@@ -227,12 +228,7 @@ export function CommitActivity() {
                   </span>
                 </span>
               ) : (
-                <>
-                  <span className="activity__count">
-                    {commitActivity.total.toLocaleString()}
-                  </span>{" "}
-                  contributions in the last year.
-                </>
+                <ActivityTitle total={commitActivity.total} />
               )}
             </h2>
             <p className="section-blurb">
@@ -434,6 +430,16 @@ export function CommitActivity() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ActivityTitle({ total }: { total: number }) {
+  const [n, ref] = useCountUp(total, { duration: 1800 });
+  return (
+    <span ref={ref as React.RefObject<HTMLSpanElement>}>
+      <span className="activity__count">{n.toLocaleString()}</span>{" "}
+      contributions in the last year.
+    </span>
   );
 }
 

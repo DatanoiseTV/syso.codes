@@ -37,6 +37,12 @@ export function ProjectGrid({ projects }: Props) {
     }
   }, [view]);
 
+  const counts = useMemo<Record<string, number>>(() => {
+    const c: Record<string, number> = { all: projects.length };
+    for (const p of projects) c[p.category] = (c[p.category] ?? 0) + 1;
+    return c;
+  }, [projects]);
+
   const filtered = useMemo(() => {
     const list =
       filter === "all" ? projects : projects.filter((p) => p.category === filter);
@@ -100,6 +106,7 @@ export function ProjectGrid({ projects }: Props) {
                 onClick={() => setFilter(f.value)}
               >
                 {f.label}
+                <span className="filter-pill__count">{counts[f.value] ?? 0}</span>
               </button>
             ))}
           </div>

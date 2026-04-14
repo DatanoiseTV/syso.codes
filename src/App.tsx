@@ -10,6 +10,7 @@ import { Footer } from "./components/Footer";
 import { CanvasBackground } from "./components/CanvasBackground";
 import { ScrollProgress } from "./components/ScrollProgress";
 import { AnimatedFavicon } from "./components/AnimatedFavicon";
+import { SectionRail } from "./components/SectionRail";
 
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
 // `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
@@ -47,6 +48,7 @@ export default function App() {
       </a>
       <AnimatedFavicon />
       <ScrollProgress />
+      <SectionRail />
       <CanvasBackground />
       <Nav />
       <main id="main">
