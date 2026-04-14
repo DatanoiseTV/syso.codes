@@ -110,15 +110,6 @@ export function CommitActivity() {
     [weekdayTotals]
   );
 
-  // peak day (single best day of the year)
-  const peakDay = useMemo(() => {
-    let best: FlatDay | null = null;
-    for (const d of flatDays) {
-      if (!best || d.count > best.count) best = d;
-    }
-    return best;
-  }, [flatDays]);
-
   // bucket counts into 0..4 levels
   const levelFor = useMemo(() => {
     const max = commitActivity.max;
@@ -209,9 +200,7 @@ export function CommitActivity() {
       <div className="activity__inner">
         <div className="activity__head">
           <div>
-            <p className="section-eyebrow">
-              <span className="section-num">02</span>Activity
-            </p>
+            <p className="section-eyebrow">Activity</p>
             <h2 className="section-title activity__title">
               {playInfo ? (
                 <span className="activity__playback-title">
@@ -390,44 +379,6 @@ export function CommitActivity() {
           )}
         </div>
 
-        {/* Insights strip */}
-        <div className="activity__insights" role="list">
-          <Insight
-            label="Peak day"
-            value={
-              peakDay
-                ? new Date(peakDay.date).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })
-                : "—"
-            }
-            detail={
-              peakDay
-                ? `${peakDay.count} ${peakDay.count === 1 ? "commit" : "commits"}`
-                : ""
-            }
-          />
-          <Insight
-            label="Busiest weekday"
-            value={WEEKDAYS[busiestWeekday] ?? "—"}
-            detail={`${weekdayTotals[busiestWeekday]!.toLocaleString()} total`}
-          />
-          <Insight
-            label="Avg / active day"
-            value={
-              commitActivity.activeDays > 0
-                ? (commitActivity.total / commitActivity.activeDays).toFixed(1)
-                : "—"
-            }
-            detail="commits"
-          />
-          <Insight
-            label="Last update"
-            value={commitActivity.fetchedAt.slice(0, 10)}
-            detail="fetched at build time"
-          />
-        </div>
       </div>
     </section>
   );
@@ -448,24 +399,6 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="activity-stat">
       <div className="activity-stat__value">{value}</div>
       <div className="activity-stat__label">{label}</div>
-    </div>
-  );
-}
-
-function Insight({
-  label,
-  value,
-  detail,
-}: {
-  label: string;
-  value: string;
-  detail?: string;
-}) {
-  return (
-    <div className="insight" role="listitem">
-      <span className="insight__label">{label}</span>
-      <span className="insight__value">{value}</span>
-      {detail && <span className="insight__detail">{detail}</span>}
     </div>
   );
 }

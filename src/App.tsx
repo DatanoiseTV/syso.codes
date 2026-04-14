@@ -8,9 +8,7 @@ import { FeaturedProject } from "./components/FeaturedProject";
 import { ProjectGrid } from "./components/ProjectGrid";
 import { Footer } from "./components/Footer";
 import { CanvasBackground } from "./components/CanvasBackground";
-import { ScrollProgress } from "./components/ScrollProgress";
 import { AnimatedFavicon } from "./components/AnimatedFavicon";
-import { SectionRail } from "./components/SectionRail";
 
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
 // `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
@@ -20,8 +18,6 @@ const GH_TOTAL_STARS = 1079;
 
 export default function App() {
   const allProjects = useMemo(() => {
-    // curated wins on slug collision; both sources get pushedAt from the
-    // shared dates map so the grid can sort everything by recency uniformly.
     const seen = new Set(curated.map((p) => p.slug));
     const merged = [
       ...curated,
@@ -47,8 +43,6 @@ export default function App() {
         Skip to content
       </a>
       <AnimatedFavicon />
-      <ScrollProgress />
-      <SectionRail />
       <CanvasBackground />
       <Nav />
       <main id="main">
@@ -59,9 +53,7 @@ export default function App() {
         <section id="featured" className="featured-section" aria-labelledby="featured-title">
           <div className="section-head">
             <div>
-              <p className="section-eyebrow">
-                <span className="section-num">03</span>Highlights
-              </p>
+              <p className="section-eyebrow">Highlights</p>
               <h2 className="section-title" id="featured-title">Projects worth a closer look.</h2>
               <p className="section-blurb">
                 A handful of recent builds — audio servers, native macOS tools,
@@ -89,25 +81,15 @@ export default function App() {
 function Nav() {
   return (
     <nav className="nav" aria-label="Main navigation">
-      <div className="nav__brand-row">
-        <a className="nav__brand" href="#top" aria-label="syso.codes home">
-          <BrandMark />
-          syso<span className="nav__brand-dot">.</span>codes
-        </a>
-        <span
-          className="nav__status"
-          title="Available for interesting projects"
-          aria-label="Status: available for interesting projects"
-        >
-          <span className="nav__status-dot" aria-hidden="true" />
-          Available
-        </span>
-      </div>
+      <a className="nav__brand" href="#top" aria-label="syso.codes home">
+        <BrandMark />
+        syso<span className="nav__brand-dot">.</span>codes
+      </a>
       <ul className="nav__links" role="list">
         <li><a href="#about">About</a></li>
         <li><a href="#activity">Activity</a></li>
         <li><a href="#featured">Featured</a></li>
-        <li><a href="#projects">All projects</a></li>
+        <li><a href="#projects">Projects</a></li>
         <li>
           <a
             href="https://github.com/DatanoiseTV"
@@ -123,10 +105,6 @@ function Nav() {
   );
 }
 
-/**
- * Brand mark — a stylised oscilloscope-style sine + square wave inside a
- * rounded square. Designed to read at 28px in the nav and 64px as a favicon.
- */
 function BrandMark() {
   return (
     <svg
@@ -147,17 +125,7 @@ function BrandMark() {
           <stop offset="1" stopColor="#ffa476" />
         </linearGradient>
       </defs>
-      <rect
-        x="1"
-        y="1"
-        width="30"
-        height="30"
-        rx="9"
-        fill="url(#brand-bg)"
-        stroke="rgba(255, 255, 255, 0.12)"
-        strokeWidth="1"
-      />
-      {/* sine wave that crosses to a square wave — embedded audio in one mark */}
+      <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#brand-bg)" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
       <path
         d="M 5 16 Q 8 8, 11 16 T 17 16 L 17 11 L 21 11 L 21 21 L 25 21 L 25 16 L 27 16"
         fill="none"
@@ -166,7 +134,6 @@ function BrandMark() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* power LED dot */}
       <circle cx="25" cy="7" r="1.6" fill="#ff8551" />
     </svg>
   );
