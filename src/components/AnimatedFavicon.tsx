@@ -1,34 +1,37 @@
 import { useEffect } from "react";
 
 /**
- * The trick: draw a 32×32 <canvas> that repaints an oscilloscope
- * sine + square wave a few times a second, then pipe the result into
- * the favicon via toDataURL() + link.href.
+ * High-visibility animated favicon.
  *
- * - No render, returns null — just a side effect on the document head.
- * - Runs at ~12.5 fps (80 ms tick) — enough to feel alive, low enough
- *   to barely touch the CPU; browser already freezes rAF on hidden
- *   tabs so the setInterval pauses effectively there too.
- * - Respects prefers-reduced-motion: renders a single static frame
- *   and never starts the interval.
- * - If the user re-mounts (hot-reload during dev) the old interval
- *   is cleaned up so we don't leak.
+ * Trick: draw a 32×32 @2x canvas and pipe toDataURL() into a <link
+ * rel="icon">. Every 80 ms (~12.5 fps) we repaint with a new phase so
+ * the tab icon animates live.
+ *
+ * Design goals (after v1 was too subtle in a crowded tab bar):
+ * - Solid bright orange background — most favicons in the wild are
+ *   dark/blue/grey, so a warm orange square is easy to pick out in
+ *   peripheral vision.
+ * - Thick black waveform (3.5 px) with big amplitude — readable even
+ *   when the OS scales the icon down to 16 px.
+ * - Bright white playhead dot that travels along the waveform so the
+ *   motion is focal, not incidental.
+ * - Subtle "heartbeat" brightness pulse on the whole square every
+ *   couple of seconds to pull the eye back.
+ * - prefers-reduced-motion: paints one static frame and never starts
+ *   the interval.
  */
 export function AnimatedFavicon() {
   useEffect(() => {
     const canvas = document.createElement("canvas");
-    // Retina-friendly: draw at 2x and let the browser downscale
     const SIZE = 32;
-    const scale = 2;
-    canvas.width = SIZE * scale;
-    canvas.height = SIZE * scale;
+    const DPR = 2; // render at 2× for crisp retina
+    canvas.width = SIZE * DPR;
+    canvas.height = SIZE * DPR;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.scale(scale, scale);
+    ctx.scale(DPR, DPR);
 
-    // Find (or create) a png favicon link. Leave the SVG one in place
-    // as a fallback for browsers that prefer it — we just override with
-    // PNG when the canvas version is ready.
+    // Inject a dedicated PNG favicon link — leave the SVG fallback in place
     let link =
       document.querySelector<HTMLLinkElement>(
         'link[rel~="icon"][data-animated="1"]'
@@ -38,8 +41,6 @@ export function AnimatedFavicon() {
       link.rel = "icon";
       link.type = "image/png";
       link.dataset.animated = "1";
-      // Insert before the static one so it wins the "last one wins" rule
-      // for matching type.
       document.head.appendChild(link);
     }
 
@@ -49,81 +50,75 @@ export function AnimatedFavicon() {
     function draw() {
       ctx!.clearRect(0, 0, SIZE, SIZE);
 
-      // Rounded-square background with the same gradient as the brand mark
+      // Heartbeat: 0.88 → 1.08 brightness multiplier, slow pulse
+      const beat = 0.98 + Math.sin(phase * 0.22) * 0.06;
+
+      // Bold orange gradient background, rounded square filling whole canvas
       const bg = ctx!.createLinearGradient(0, 0, SIZE, SIZE);
-      bg.addColorStop(0, "#10122a");
-      bg.addColorStop(1, "#000000");
+      bg.addColorStop(0, shade("#ff6b35", beat));
+      bg.addColorStop(1, shade("#ffa476", beat + 0.04));
       ctx!.fillStyle = bg;
-      roundRect(ctx!, 1, 1, 30, 30, 9);
+      roundRect(ctx!, 0, 0, SIZE, SIZE, 7);
       ctx!.fill();
-      ctx!.strokeStyle = "rgba(255, 255, 255, 0.14)";
+
+      // Inner glow ring on the edge for a touch of depth
+      ctx!.strokeStyle = "rgba(0, 0, 0, 0.28)";
       ctx!.lineWidth = 1;
+      roundRect(ctx!, 0.5, 0.5, SIZE - 1, SIZE - 1, 7);
       ctx!.stroke();
 
-      // Subtle scope grid (faint crosshair)
-      ctx!.strokeStyle = "rgba(255, 255, 255, 0.05)";
-      ctx!.lineWidth = 1;
-      ctx!.beginPath();
-      ctx!.moveTo(5, 16);
-      ctx!.lineTo(27, 16);
-      ctx!.moveTo(16, 5);
-      ctx!.lineTo(16, 27);
-      ctx!.stroke();
+      // Compute the waveform points (sine with phase drift)
+      const pts: Array<[number, number]> = [];
+      const left = 4;
+      const right = 28;
+      const mid = 16;
+      for (let x = left; x <= right; x += 0.4) {
+        const t = (x - left) / (right - left);
+        const y = mid + Math.sin(t * Math.PI * 2 + phase * 0.5) * 7;
+        pts.push([x, y]);
+      }
 
-      // Animated sine → square trace
-      // Moves left-to-right at phase speed; amplitude gently modulated
-      const grad = ctx!.createLinearGradient(5, 0, 27, 0);
-      grad.addColorStop(0, "#ff6b35");
-      grad.addColorStop(1, "#ffa476");
-      ctx!.strokeStyle = grad;
-      ctx!.lineWidth = 2.2;
+      // Thick black wave
+      ctx!.strokeStyle = "#0a0a0d";
+      ctx!.lineWidth = 3.5;
       ctx!.lineCap = "round";
       ctx!.lineJoin = "round";
-
       ctx!.beginPath();
-      const amp = 4 + Math.sin(phase * 0.35) * 1.5;
-      for (let x = 5; x <= 27; x += 0.5) {
-        const t = (x - 5) / 22;
-        // first half: sine, second half: square-ish (signum of sin)
-        let y: number;
-        if (t < 0.55) {
-          y = 16 + Math.sin(t * Math.PI * 4 + phase) * amp;
-        } else {
-          const s = Math.sin((t - 0.55) * Math.PI * 6 + phase * 0.6);
-          y = 16 + Math.sign(s) * (amp - 0.2);
-        }
-        if (x === 5) ctx!.moveTo(x, y);
+      pts.forEach(([x, y], i) => {
+        if (i === 0) ctx!.moveTo(x, y);
         else ctx!.lineTo(x, y);
-      }
+      });
       ctx!.stroke();
 
-      // Soft glow — redraw the path with a shadow
-      ctx!.shadowColor = "#ff6b35";
-      ctx!.shadowBlur = 3;
-      ctx!.stroke();
+      // White playhead dot travelling along the wave
+      const pt = pts[Math.floor(((phase * 0.03) % 1) * (pts.length - 1))]!;
+      ctx!.shadowColor = "rgba(255, 255, 255, 0.9)";
+      ctx!.shadowBlur = 5;
+      ctx!.fillStyle = "#ffffff";
+      ctx!.beginPath();
+      ctx!.arc(pt[0], pt[1], 2.8, 0, Math.PI * 2);
+      ctx!.fill();
       ctx!.shadowBlur = 0;
 
-      // Power LED dot (coral, top-right)
-      ctx!.fillStyle = "#ff8551";
+      // Black ring to separate the dot from the wave
+      ctx!.strokeStyle = "#0a0a0d";
+      ctx!.lineWidth = 0.8;
       ctx!.beginPath();
-      ctx!.arc(25, 7, 1.6, 0, Math.PI * 2);
-      ctx!.fill();
+      ctx!.arc(pt[0], pt[1], 2.8, 0, Math.PI * 2);
+      ctx!.stroke();
 
-      // Push to favicon
       try {
         link!.href = canvas.toDataURL("image/png");
       } catch {
-        // ignore — some browsers may throw on rare conditions
+        // ignore
       }
     }
 
-    // Initial frame
     draw();
-    if (reduced) return; // static frame only
+    if (reduced) return;
 
-    // ~12.5 fps — slow enough to be cheap, fast enough to look alive
     const id = window.setInterval(() => {
-      phase += 0.28;
+      phase += 0.45;
       draw();
     }, 80);
 
@@ -133,6 +128,15 @@ export function AnimatedFavicon() {
   }, []);
 
   return null;
+}
+
+/** Multiply each rgb channel of a hex colour by k (clamped to 0-255). */
+function shade(hex: string, k: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.min(255, Math.round(((n >> 16) & 0xff) * k)));
+  const g = Math.max(0, Math.min(255, Math.round(((n >> 8) & 0xff) * k)));
+  const b = Math.max(0, Math.min(255, Math.round((n & 0xff) * k)));
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 function roundRect(

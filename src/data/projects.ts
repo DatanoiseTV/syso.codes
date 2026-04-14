@@ -735,6 +735,7 @@ export const projects: Project[] = [
     url: "https://github.com/DatanoiseTV/nginx-fancy-index-hook",
     image:
       "https://github.com/user-attachments/assets/438c614f-24b0-459a-abc0-c1824c35764e",
+    featured: true,
   },
   {
     slug: "TurboMidi",

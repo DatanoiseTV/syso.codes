@@ -43,6 +43,7 @@ const skipNames = new Set([
   "RaspberryPi-PL011-MIDI",
   "BeMicro-CV-Multicomp",
   "Gramofon",
+  "syso.codes",
 ]);
 
 const filtered = raw.filter((r) => {
