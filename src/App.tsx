@@ -9,6 +9,7 @@ import { ProjectGrid } from "./components/ProjectGrid";
 import { Footer } from "./components/Footer";
 import { CanvasBackground } from "./components/CanvasBackground";
 import { ScrollProgress } from "./components/ScrollProgress";
+import { AnimatedFavicon } from "./components/AnimatedFavicon";
 
 // Live counts from `gh api users/DatanoiseTV` — refresh by re-running
 // `node scripts/gen-auto-projects.mjs` (which logs them) or by calling
@@ -44,6 +45,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
+      <AnimatedFavicon />
       <ScrollProgress />
       <CanvasBackground />
       <Nav />
